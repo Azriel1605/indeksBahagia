@@ -1,8 +1,10 @@
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
+from pathlib import Path
+env_path = Path(__file__).parent / ".env"
 
-# load_dotenv(dotenv_path="/var/www/Lansia/backend/.env")
+load_dotenv(dotenv_path=env_path)
 
 class Config:
     # Database
@@ -11,9 +13,8 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    print(SQLALCHEMY_DATABASE_URI)
     # Security
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
+    SECRET_KEY = os.getenv('SECRET_KEY')
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
     PERMANENT_SESSION_LIFETIME = timedelta(hours=24)
@@ -22,12 +23,12 @@ class Config:
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = 'keyapkeyop@gmail.com'         # Email kamu
-    MAIL_PASSWORD = 'nind plrl oikp rveu'          # App password dari Google
-    MAIL_DEFAULT_SENDER = 'keyapkeyop@gmail.com'
+    MAIL_USERNAME = os.getenv("MAIL_USERNAME")         # Email kamu
+    MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")          # App password dari Google
+    MAIL_DEFAULT_SENDER = os.getenv("MAIL_USERNAME")
     
     # CORS
-    CORS_ORIGINS = [os.getenv("FRONTEND_URL", "http://lansia.cipamokolan.id")]
+    CORS_ORIGINS = [os.getenv("FRONTEND_URL")]
     CORS_SUPPORTS_CREDENTIALS = True
 
 class DevelopmentConfig(Config):

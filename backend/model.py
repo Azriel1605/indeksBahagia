@@ -6,6 +6,15 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 db = SQLAlchemy()
 
+class PasswordResetToken(db.Model):
+    __tablename__ = 'password_reset_tokens'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(255), unique=True, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+
 class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
@@ -33,16 +42,12 @@ class User(db.Model):
         back_populates='target',
         cascade='all, delete-orphan'
     )
-    
 
-class PasswordResetToken(db.Model):
-    __tablename__ = 'password_reset_tokens'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    token = db.Column(db.String(255), unique=True, nullable=False)
-    expires_at = db.Column(db.DateTime, nullable=False)
-    used = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.now)
+class RecordSiswaHarianPermission(db.Model):
+    __tablename__   = 'record_siswa_harian_permission'
+    id              = db.Column(db.Integer, primary_key=True)
+    kelas           = db.Column(db.String(50), nullable=False)
+    is_active       = db.Column(db.Boolean, nullable=False, default="False")
     
 class RecordSiswaHarian(db.Model):
     __tablename__ = 'record_siswa_harian'
