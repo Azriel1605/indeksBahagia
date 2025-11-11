@@ -1,3 +1,4 @@
+/frontend/deploy.sh
 /backend/venv
 /backend/.env
 /backend/__pycache__/
@@ -43,6 +44,7 @@
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
 
 
 
