@@ -1,8 +1,0 @@
-flask
-flask-cors
-flask-bcrypt
-flask-migrate
-flask-mail
-flask-sqlalchemy
-sqlalchemy
-python-dotenv
