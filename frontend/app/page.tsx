@@ -4,7 +4,12 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Users, Heart, Home, TrendingUp } from "lucide-react"
+import { Line, ResponsiveContainer } from "recharts"
+import HappinessGauge from "@/components/gauge-chart"
 import Link from "next/link"
+import InfoCard from "@/components/info-card"
+import LineChartSekolah from "@/components/ui/line-chart"
+import BarChartSHI from "@/components/ui/barchart"
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function HomePage() {
@@ -49,14 +54,14 @@ export default function HomePage() {
               <div className="rounded-md shadow">
                 <Link href="/dashboard">
                   <Button size="lg" className="w-full sm:w-auto">
-                    Lihat Dashboard
+                    Lihat Analisis
                   </Button>
                 </Link>
               </div>
               <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
                 <Link href="/input-data">
                   <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent">
-                    Input Data Baru
+                    Buka Survey
                   </Button>
                 </Link>
               </div>
@@ -67,50 +72,58 @@ export default function HomePage() {
 
       {/* Stats Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Gauge Chart and counter student */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Lansia</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Rata-rata Indeks Kebahagiaan Sekolah</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalLansia}</div>
-              <p className="text-xs text-muted-foreground">Terdaftar di wilayah RW</p>
+              <HappinessGauge value={80.2} label="Kebahagiaan Siswa" size={300}/>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Kondisi Sehat</CardTitle>
+              <CardTitle className="text-sm font-medium">Guage Chart</CardTitle>
               <Heart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalSehat}</div>
-              <p className="text-xs text-muted-foreground">Lansia dengan kondisi sehat</p>
+              <div className="mt-5 max-w-md mx-auto sm:flex-col space-y-4 sm:justify-center md:mt-8">
+                <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent">
+                    Merah {"<40"} (<span className="text-red-600">Risiko Tinggi</span>)
+                  </Button>
+                </div>
+                <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
+                  <Link href="/input-data">
+                    <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent">
+                      Buka Survey
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </CardContent>
           </Card>
-
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Butuh Bantuan</CardTitle>
-              <Home className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Jumlah siswa dalam kondisi risiko</CardTitle>
+              <Heart className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalMembutuhkanBantuan}</div>
-              <p className="text-xs text-muted-foreground">Membutuhkan bantuan khusus</p>
+            <CardContent className="flex flex-col items-center w-full h-full">
+              <p className="text-gray-600">Siswa yang berada pada status "warning" selama 3 hari berturut-turu</p>
+              <br />
+              <InfoCard value={23} label="Siswa" color="#EF4444" size="lg" />
             </CardContent>
           </Card>
+        </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Aktif BKL</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalAktifBKL}</div>
-              <p className="text-xs text-muted-foreground">Berpartisipasi dalam BKL</p>
-            </CardContent>
-          </Card>
+        <br />
+
+        {/* Line Chart and Distribution */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 space-y-4">
+          <LineChartSekolah />
+          <BarChartSHI />
         </div>
       </div>
 

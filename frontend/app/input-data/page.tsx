@@ -8,63 +8,10 @@ import { Button } from "@/components/ui/button"
 import { FileUp, UserPlus } from "lucide-react"
 import { dataAPI } from "@/lib/api"
 import RouteGuard from "@/components/route-guard"
-import PersonalDataSection from "@/components/personal-data-section"
-import HealthDataSection from "@/components/health-data-section"
-import WelfareDataSection from "@/components/welfare-data-section"
-import FamilyDataSection from "@/components/family-data-section"
-import ADLSection from "@/components/adl-section"
-import ExcelUploadSection from "@/components/excel-upload-section"
 
 function InputDataContent() {
   const [formData, setFormData] = useState({
-    // Personal Data (Lansia table)
-    nama_lengkap: "",
-    nik: "",
-    jenis_kelamin: "",
-    tanggal_lahir: "",
-    alamat_lengkap: "",
-    koordinat: "",
-    rt: "",
-    rw: "",
-    status_perkawinan: "",
-    agama: "",
-    pendidikan_terakhir: "",
-    pekerjaan_terakhir: "",
-    sumber_penghasilan: "",
-    // Health Data (KesehatanLansia table)
-    kondisi_kesehatan_umum: "",
-    riwayat_penyakit_kronis: [] as string[],
-    penggunaan_obat_rutin: "",
-    alat_bantu: "",
-    aktivitas_fisik: "",
-    status_gizi: "",
-    riwayat_imunisasi: "",
-    // Social Welfare Data (KesejahteraanSosial table)
-    dukungan_keluarga: "",
-    kondisi_rumah: "",
-    kebutuhan_mendesak: [] as string[],
-    hobi_minat: "",
-    kondisi_psikologis: "",
-    // Family Data (KeluargaPendamping table)
-    nama_pendamping: "",
-    hubungan_dengan_lansia: "",
-    tanggal_lahir_pendamping: "",
-    pendidikan_pendamping: "",
-    ketersediaan_waktu: "",
-    partisipasi_program_bkl: "",
-    riwayat_partisipasi_bkl: "",
-    keterlibatan_data: "",
-    // Daily Living Activities (ADailyLiving table)
-    bab: 0,
-    bak: 0,
-    membersihkan_diri: 0,
-    toilet: 0,
-    makan: 0,
-    pindah_tempat: 0,
-    mobilitas: 0,
-    berpakaian: 0,
-    naik_turun_tangga: 0,
-    mandi:0,
+
   })
 
   const [message, setMessage] = useState("")
@@ -159,126 +106,7 @@ function InputDataContent() {
   }, [])
 
   // Memoized data objects for each section
-  const personalData = useMemo(
-    () => ({
-      nama_lengkap: formData.nama_lengkap,
-      nik: formData.nik,
-      jenis_kelamin: formData.jenis_kelamin,
-      tanggal_lahir: formData.tanggal_lahir,
-      alamat_lengkap: formData.alamat_lengkap,
-      koordinat: formData.koordinat,
-      rt: formData.rt,
-      rw: formData.rw,
-      status_perkawinan: formData.status_perkawinan,
-      agama: formData.agama,
-      pendidikan_terakhir: formData.pendidikan_terakhir,
-      pekerjaan_terakhir: formData.pekerjaan_terakhir,
-      sumber_penghasilan: formData.sumber_penghasilan,
-    }),
-    [
-      formData.nama_lengkap,
-      formData.nik,
-      formData.jenis_kelamin,
-      formData.tanggal_lahir,
-      formData.alamat_lengkap,
-      formData.koordinat,
-      formData.rt,
-      formData.rw,
-      formData.status_perkawinan,
-      formData.agama,
-      formData.pendidikan_terakhir,
-      formData.pekerjaan_terakhir,
-      formData.sumber_penghasilan,
-    ],
-  )
 
-  const healthData = useMemo(
-    () => ({
-      kondisi_kesehatan_umum: formData.kondisi_kesehatan_umum,
-      riwayat_penyakit_kronis: formData.riwayat_penyakit_kronis,
-      penggunaan_obat_rutin: formData.penggunaan_obat_rutin,
-      alat_bantu: formData.alat_bantu,
-      aktivitas_fisik: formData.aktivitas_fisik,
-      status_gizi: formData.status_gizi,
-      riwayat_imunisasi: formData.riwayat_imunisasi,
-    }),
-    [
-      formData.kondisi_kesehatan_umum,
-      formData.riwayat_penyakit_kronis,
-      formData.penggunaan_obat_rutin,
-      formData.alat_bantu,
-      formData.aktivitas_fisik,
-      formData.status_gizi,
-      formData.riwayat_imunisasi,
-    ],
-  )
-
-  const welfareData = useMemo(
-    () => ({
-      dukungan_keluarga: formData.dukungan_keluarga,
-      kondisi_rumah: formData.kondisi_rumah,
-      kebutuhan_mendesak: formData.kebutuhan_mendesak,
-      hobi_minat: formData.hobi_minat,
-      kondisi_psikologis: formData.kondisi_psikologis,
-    }),
-    [
-      formData.dukungan_keluarga,
-      formData.kondisi_rumah,
-      formData.kebutuhan_mendesak,
-      formData.hobi_minat,
-      formData.kondisi_psikologis,
-    ],
-  )
-
-  const familyData = useMemo(
-    () => ({
-      nama_pendamping: formData.nama_pendamping,
-      hubungan_dengan_lansia: formData.hubungan_dengan_lansia,
-      tanggal_lahir_pendamping: formData.tanggal_lahir_pendamping,
-      pendidikan_pendamping: formData.pendidikan_pendamping,
-      ketersediaan_waktu: formData.ketersediaan_waktu,
-      partisipasi_program_bkl: formData.partisipasi_program_bkl,
-      riwayat_partisipasi_bkl: formData.riwayat_partisipasi_bkl,
-      keterlibatan_data: formData.keterlibatan_data,
-    }),
-    [
-      formData.nama_pendamping,
-      formData.hubungan_dengan_lansia,
-      formData.tanggal_lahir_pendamping,
-      formData.pendidikan_pendamping,
-      formData.ketersediaan_waktu,
-      formData.partisipasi_program_bkl,
-      formData.riwayat_partisipasi_bkl,
-      formData.keterlibatan_data,
-    ],
-  )
-
-  const adlData = useMemo(
-    () => ({
-      bab: formData.bab,
-      bak: formData.bak,
-      membersihkan_diri: formData.membersihkan_diri,
-      toilet: formData.toilet,
-      makan: formData.makan,
-      pindah_tempat: formData.pindah_tempat,
-      mobilitas: formData.mobilitas,
-      berpakaian: formData.berpakaian,
-      naik_turun_tangga: formData.naik_turun_tangga,
-      mandi: formData.mandi,
-    }),
-    [
-      formData.bab,
-      formData.bak,
-      formData.membersihkan_diri,
-      formData.toilet,
-      formData.makan,
-      formData.pindah_tempat,
-      formData.mobilitas,
-      formData.berpakaian,
-      formData.naik_turun_tangga,
-      formData.mandi
-    ],
-  )
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -313,16 +141,6 @@ function InputDataContent() {
                 </Alert>
               )}
 
-              <PersonalDataSection data={personalData} onChange={handleInputChange} />
-
-              <HealthDataSection data={healthData} onChange={handleInputChange} onArrayChange={handleArrayChange} />
-
-              <WelfareDataSection data={welfareData} onChange={handleInputChange} onArrayChange={handleArrayChange} />
-
-              <FamilyDataSection data={familyData} onChange={handleInputChange} />
-
-              <ADLSection data={adlData} onChange={handleInputChange} />
-
               <div className="flex justify-end space-x-4">
                 <Button type="button" variant="outline" onClick={() => window.history.back()}>
                   Batal
@@ -332,10 +150,6 @@ function InputDataContent() {
                 </Button>
               </div>
             </form>
-          </TabsContent>
-
-          <TabsContent value="excel">
-            <ExcelUploadSection />
           </TabsContent>
         </Tabs>
       </div>
