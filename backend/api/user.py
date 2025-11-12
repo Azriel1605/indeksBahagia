@@ -39,6 +39,7 @@ def login():
         session['user_id'] = user.id
         session['username'] = user.username
         session['role'] = user.role
+        session['kelas'] = user.kelas
         
         return jsonify({
             'message': 'Login successful',

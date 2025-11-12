@@ -79,38 +79,47 @@ export const dataAPI = {
 
   getLansiaDetail: (id: number) => apiCall(`/api/lansia/${id}`),
 
-  createLansia: (data: any) =>
-    apiCall("/api/lansia", {
+  submitSurveyHarian: (data: any) =>
+    apiCall("/api/submit-form-harian", {
       method: "POST",
       body: JSON.stringify(data),
     }),
 
-  updateLansia: (id: number, data: any) =>
-    apiCall(`/api/lansia/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(data),
-    }),
+  // createLansia: (data: any) =>
+  //   apiCall("/api/lansia", {
+  //     method: "POST",
+  //     body: JSON.stringify(data),
+  //   }),
 
-  deleteLansia: (id: number) =>
-    apiCall(`/api/lansia/${id}`, {
-      method: "DELETE",
-    }),
+  // updateLansia: (id: number, data: any) =>
+  //   apiCall(`/api/lansia/${id}`, {
+  //     method: "PUT",
+  //     body: JSON.stringify(data),
+  //   }),
 
-  bulkDeleteLansia: (ids: number[]) =>
-    apiCall("/api/lansia/bulk-delete", {
-      method: "POST",
-      body: JSON.stringify({ ids }),
-    }),
+  // deleteLansia: (id: number) =>
+  //   apiCall(`/api/lansia/${id}`, {
+  //     method: "DELETE",
+  //   }),
 
-  getFilterOptions: () => apiCall("/api/filter-options"),
+  // bulkDeleteLansia: (ids: number[]) =>
+  //   apiCall("/api/lansia/bulk-delete", {
+  //     method: "POST",
+  //     body: JSON.stringify({ ids }),
+  //   }),
 
-  getDemographics: () => apiCall("/api/dashboard/demographics"),
-  getHealthStats: () => apiCall("/api/dashboard/health"),
-  getSocialWelfare: () => apiCall("/api/dashboard/social-welfare"),
-  getNeedsPotential: () => apiCall("/api/dashboard/needs-potential"),
-  getUrgentNeedDetails: (needType: string) =>
-    apiCall(`/api/dashboard/urgent-need-details/${encodeURIComponent(needType)}`),
+  // getFilterOptions: () => apiCall("/api/filter-options"),
 
-  exportTemplate: () => apiCall("/api/export-template"),
-  uploadExcel: () => apiCall("api/upload-excel"),
+  // getDemographics: () => apiCall("/api/dashboard/demographics"),
+  // getHealthStats: () => apiCall("/api/dashboard/health"),
+  // getSocialWelfare: () => apiCall("/api/dashboard/social-welfare"),
+  // getNeedsPotential: () => apiCall("/api/dashboard/needs-potential"),
+  // getUrgentNeedDetails: (needType: string) =>
+  //   apiCall(`/api/dashboard/urgent-need-details/${encodeURIComponent(needType)}`),
+
+  // exportTemplate: () => apiCall("/api/export-template"),
+  // uploadExcel: () => apiCall("api/upload-excel"),
+  validInput: (type: "harian" | "mingguan") =>
+    apiCall(`/api/valid-input/${type}`),
+
 }

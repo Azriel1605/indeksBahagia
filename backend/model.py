@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.ext.hybrid import hybrid_property
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from sqlalchemy import String, func, extract, cast, Integer, case
 from sqlalchemy.dialects.postgresql import ARRAY
 
@@ -42,6 +42,42 @@ class User(db.Model):
         back_populates='target',
         cascade='all, delete-orphan'
     )
+    
+    def has_filled_survey(self, tipe: str = "harian") -> bool:
+        """Cek apakah user sudah mengisi survey berdasarkan tipe ('harian' / 'mingguan')."""
+        today = date.today()
+
+        if tipe == "harian":
+            record = RecordSiswaHarian.query.filter(
+                RecordSiswaHarian.user_id == self.id,
+                func.date(RecordSiswaHarian.date) == today
+            ).first()
+        elif tipe == "mingguan":
+            start_of_week = today - timedelta(days=today.weekday())  # Senin
+            end_of_week = start_of_week + timedelta(days=6)
+            record = RecordSiswaHarian.query.filter(
+                RecordSiswaHarian.user_id == self.id,
+                func.date(RecordSiswaHarian.date).between(start_of_week, end_of_week)
+            ).first()
+        else:
+            raise ValueError("Tipe survey tidak valid. Gunakan 'harian' atau 'mingguan'.")
+
+        return record is not None
+    
+    def can_fill_survey(self, tipe: str = "harian"):
+        """Cek apakah user boleh mengisi survey harian/mingguan."""
+
+        permission = RecordSiswaHarianPermission.query.filter_by(
+            kelas=self.kelas, is_active=True
+        ).first()
+
+        if not permission:
+            return False, f"Kelas kamu belum diizinkan mengisi survey {tipe}."
+
+        if self.has_filled_survey(tipe):
+            return False, f"Kamu sudah mengisi survey {tipe}."
+
+        return True, f"Kamu boleh mengisi survey {tipe}."
 
 class RecordSiswaHarianPermission(db.Model):
     __tablename__   = 'record_siswa_harian_permission'
@@ -82,6 +118,12 @@ class RecordSiswaHarian(db.Model):
             (self.aman or 0)
         ) / 8 ) - 1) * 25
         return self.skor
+    
+class RecordSiswaMingguanPermission(db.Model):
+    __tablename__   = 'record_siswa_mingguan_permission'
+    id              = db.Column(db.Integer, primary_key=True)
+    kelas           = db.Column(db.String(50), nullable=False)
+    is_active       = db.Column(db.Boolean, nullable=False, default="False")
     
 class RecordSiswaMingguan(db.Model):
     __tablename__ = 'record_siswa_mingguan'
