@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Play, StopCircle } from "lucide-react";
 import { dataAPI } from "@/lib/api";
 
-const SurveyAccessButton: React.FC = () => {
+const SurveyAccessHarianButton: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -134,4 +134,4 @@ const SurveyAccessButton: React.FC = () => {
   );
 };
 
-export default SurveyAccessButton;
+export default SurveyAccessHarianButton;

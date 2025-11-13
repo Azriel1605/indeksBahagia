@@ -109,40 +109,6 @@ export const dataAPI = {
     body: JSON.stringify({ type, action }),
   }),
 
-  // createLansia: (data: any) =>
-  //   apiCall("/api/lansia", {
-  //     method: "POST",
-  //     body: JSON.stringify(data),
-  //   }),
-
-  // updateLansia: (id: number, data: any) =>
-  //   apiCall(`/api/lansia/${id}`, {
-  //     method: "PUT",
-  //     body: JSON.stringify(data),
-  //   }),
-
-  // deleteLansia: (id: number) =>
-  //   apiCall(`/api/lansia/${id}`, {
-  //     method: "DELETE",
-  //   }),
-
-  // bulkDeleteLansia: (ids: number[]) =>
-  //   apiCall("/api/lansia/bulk-delete", {
-  //     method: "POST",
-  //     body: JSON.stringify({ ids }),
-  //   }),
-
-  // getFilterOptions: () => apiCall("/api/filter-options"),
-
-  // getDemographics: () => apiCall("/api/dashboard/demographics"),
-  // getHealthStats: () => apiCall("/api/dashboard/health"),
-  // getSocialWelfare: () => apiCall("/api/dashboard/social-welfare"),
-  // getNeedsPotential: () => apiCall("/api/dashboard/needs-potential"),
-  // getUrgentNeedDetails: (needType: string) =>
-  //   apiCall(`/api/dashboard/urgent-need-details/${encodeURIComponent(needType)}`),
-
-  // exportTemplate: () => apiCall("/api/export-template"),
-  // uploadExcel: () => apiCall("api/upload-excel"),
   validInput: (type: "harian" | "mingguan") =>
     apiCall(`/api/valid-input/${type}`),
 

@@ -133,7 +133,23 @@ def status_survey():
             'isOpen' : res.is_active,
             'message': 'success'   
         }), 200
-                
+    
+    if survey_type == "mingguan":
+        res = RecordSiswaMingguanPermission.query.filter_by(kelas=kelas).first()
+        if not res:
+            res = RecordSiswaMingguanPermission(
+                kelas=kelas,
+                is_active=False
+            )
+            db.session.add(res)
+            db.session.commit()
+        
+        return jsonify({
+            'isOpen' : res.is_active,
+            'message': 'success'   
+        }), 200
+    
+    
     pass
 
 @api.route('/toggle-survey', methods=['POST'])
@@ -152,7 +168,7 @@ def toggle_survey():
             change.is_active = False
         db.session.commit()
     if tipe == "mingguan":
-        change = RecordSiswaMingguanPermission.query.filter(kelas=kelas).first()
+        change = RecordSiswaMingguanPermission.query.filter_by(kelas=kelas).first()
         if action == "open":
             change.is_active = True
         if action == "close":

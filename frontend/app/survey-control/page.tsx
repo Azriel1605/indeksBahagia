@@ -14,6 +14,8 @@ import SurveyMingguan from "@/components/survey-mingguan"
 import SurveyAccessButton from "./survey-harian-control"
 import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import SurveyHarianReponse from "./reponse-harian"
+import SurveyAccessHarianButton from "./survey-harian-control"
+import SurveyAccessMingguanButton from "./survey-mingguan-control"
 
 function InputDataContent() {
   type TabType = "harian" | "mingguan";
@@ -53,11 +55,12 @@ function InputDataContent() {
           </TabsList>
 
           <TabsContent value="harian">
-          </TabsContent>
-            <SurveyAccessButton />
+            <SurveyAccessHarianButton />
+            <br />
             <SurveyHarianReponse />
+          </TabsContent>
           <TabsContent value="mingguan">
-            
+            <SurveyAccessMingguanButton />
           </TabsContent>
         </Tabs>
       </div>
