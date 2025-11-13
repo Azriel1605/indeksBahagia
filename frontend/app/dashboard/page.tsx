@@ -660,7 +660,7 @@ function DashboardContent() {
 
 export default function DashboardPage() {
   return (
-    <RouteGuard requireAuth={true}>
+    <RouteGuard requireAuth={true} allowedRoles={['admin', 'guru']}>
       <DashboardContent />
     </RouteGuard>
   )

@@ -85,6 +85,30 @@ export const dataAPI = {
       body: JSON.stringify(data),
     }),
 
+  submitSurveyMingguan: (data: any) =>
+    apiCall("/api/submit-form-mingguan", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  getSurveyStatus: (type: "harian" | "mingguan") =>
+  apiCall("/api/status-survey", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ type }),
+  }),
+
+  toggleSurveyAccess: (type: "harian" | "mingguan", action: "open" | "close") =>
+  apiCall("/api/toggle-survey", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ type, action }),
+  }),
+
   // createLansia: (data: any) =>
   //   apiCall("/api/lansia", {
   //     method: "POST",

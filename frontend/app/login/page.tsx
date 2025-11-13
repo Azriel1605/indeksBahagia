@@ -37,7 +37,7 @@ function LoginPageContent() {
       } else if (role === "user") {
         router.push("/survey")
       } else if (role === "guru") {
-        router.push("/dashboard")
+        router.push("/survey")
       } else if (role === "admin") {
         router.push("/admin/dashboard")
       } else{

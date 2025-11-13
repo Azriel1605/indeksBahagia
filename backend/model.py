@@ -55,9 +55,9 @@ class User(db.Model):
         elif tipe == "mingguan":
             start_of_week = today - timedelta(days=today.weekday())  # Senin
             end_of_week = start_of_week + timedelta(days=6)
-            record = RecordSiswaHarian.query.filter(
-                RecordSiswaHarian.user_id == self.id,
-                func.date(RecordSiswaHarian.date).between(start_of_week, end_of_week)
+            record = RecordSiswaMingguan.query.filter(
+                RecordSiswaMingguan.user_id == self.id,
+                func.date(RecordSiswaMingguan.date).between(start_of_week, end_of_week)
             ).first()
         else:
             raise ValueError("Tipe survey tidak valid. Gunakan 'harian' atau 'mingguan'.")
@@ -65,11 +65,21 @@ class User(db.Model):
         return record is not None
     
     def can_fill_survey(self, tipe: str = "harian"):
+        print(tipe)
         """Cek apakah user boleh mengisi survey harian/mingguan."""
 
-        permission = RecordSiswaHarianPermission.query.filter_by(
-            kelas=self.kelas, is_active=True
-        ).first()
+        if tipe == "harian":
+            permission = RecordSiswaHarianPermission.query.filter_by(
+                kelas=self.kelas, is_active=True
+            ).first()
+        
+        elif tipe == "mingguan":
+            permission = RecordSiswaMingguanPermission.query.filter_by(
+                kelas=self.kelas, is_active=True
+            ).first()
+        
+        else:
+            raise ValueError("Tipe survey tidak valid. Gunakan 'harian' atau 'mingguan'.")
 
         if not permission:
             return False, f"Kelas kamu belum diizinkan mengisi survey {tipe}."
@@ -135,7 +145,7 @@ class RecordSiswaMingguan(db.Model):
     bahagia         = db.Column(db.Integer, nullable=False)
     semangat        = db.Column(db.Integer, nullable=False)
     beban           = db.Column(db.Integer, nullable=False)
-    ceman           = db.Column(db.Integer, nullable=False)
+    cemas           = db.Column(db.Integer, nullable=False)
     bantuan_guru    = db.Column(db.Integer, nullable=False)
     menghargai      = db.Column(db.Integer, nullable=False)
     aman            = db.Column(db.Integer, nullable=False)
@@ -153,8 +163,8 @@ class RecordSiswaMingguan(db.Model):
         self.skor = (((
             (self.bahagia or 0) +
             (self.semangat or 0) +
-            (self.beban or 0) +
-            (self.ceman or 0) +
+            (6- (self.beban or 0)) +
+            (6 - (self.cemas or 0)) +
             (self.bantuan_guru or 0) +
             (self.menghargai or 0) +
             (self.aman or 0)

@@ -16,7 +16,7 @@ export default function Navbar() {
   const navItems = [
     { href: "/", label: "Home", icon: Home, requireAuth: true },
     { href: "/dashboard", label: "Dashboard", icon: BarChart3, requireAuth: true },
-    { href: "/survey", label: "Survey", icon: ListCheckIcon, requireAuth: true },
+    { href: "/survey-control", label: "Survey", icon: ListCheckIcon, requireAuth: true },
     { href: "/data-siswa", label: "Lihat Data", icon: ListOrderedIcon, requireAuth: true },
   ]
 
