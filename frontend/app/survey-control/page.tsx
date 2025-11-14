@@ -17,12 +17,22 @@ import SurveyHarianReponse from "./reponse-harian"
 import SurveyAccessHarianButton from "./survey-harian-control"
 import SurveyAccessMingguanButton from "./survey-mingguan-control"
 import SurveyMingguanResponse from "./response-mingguan"
+import WordCloud from "@/components/word-cloud"
 
 function InputDataContent() {
   type TabType = "harian" | "mingguan";
 
 
   const [isLoading, setIsLoading] = useState(false)
+  const data =  [
+      { text: "Bahagia", value: 20 },
+      { text: "Sedih", value: 5 },
+      { text: "Semangat", value: 15 },
+      { text: "Fokus", value: 12 },
+      { text: "Stress", value: 8 },
+      { text: "Aman", value: 11 },
+      { text: "Tenang", value: 14 },
+    ];
 
   if (isLoading) {
     return (
@@ -64,6 +74,8 @@ function InputDataContent() {
             <SurveyAccessMingguanButton />
             <br />
             <SurveyMingguanResponse />
+            <br />
+            <WordCloud  words={data} width={600} height={400} />
           </TabsContent>
         </Tabs>
       </div>
