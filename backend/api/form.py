@@ -1,6 +1,8 @@
 from flask import request, jsonify, session
 from . import api
 from model import db, RecordSiswaHarian, RecordSiswaMingguan, RecordSiswaHarianPermission, User, RecordSiswaMingguanPermission
+from datetime import date
+from sqlalchemy import func
 
 @api.route('/submit-form-harian', methods=["POST"])
 def submit_form_harian():
@@ -186,5 +188,31 @@ def valid_input(tipe):
         'message' : message,
     }), 200
 
+@api.route('/counter-submit', methods=['GET', 'POST'])
+def counter_submit():
+    kelas = session.get('kelas')
+    today = date.today()
+    
+    data = request.get_json()
+    user_ids = [u.id for u in User.query.filter_by(kelas=kelas).all()]
+    tipe = data.get('type')
+    if tipe == 'harian':
+        record = RecordSiswaHarian.query.filter(
+            RecordSiswaHarian.user_id.in_(user_ids),
+            func.date(RecordSiswaHarian.date) == today
+        ).all()
+    if tipe == 'mingguan':
+        record = RecordSiswaMingguan.query.filter(
+            RecordSiswaMingguan.user_id.in_(user_ids),
+            func.date(RecordSiswaMingguan.date) == today
+        ).all()
+        
+    print(kelas, len(record))
+    
+    return jsonify({
+        'message': 'success',
+        'count': len(record)
+    }), 200
+    
     
     

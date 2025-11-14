@@ -89,14 +89,14 @@ const SurveyAccessMingguanButton: React.FC = () => {
   // 🌀 Loading state (saat belum dapat status dari API)
   if (isOpen === null) {
     return (
-      <div className="w-full md:w-1/2 bg-white border border-gray-200 rounded-2xl shadow-md p-4 flex items-center justify-center">
+      <div className="w-full bg-white border border-gray-200 rounded-2xl shadow-md p-4 flex items-center justify-center">
         <span className="text-gray-500 animate-pulse">Memuat status survei...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-between w-full md:w-1/2 bg-white border border-gray-200 rounded-2xl shadow-md p-4">
+    <div className="flex items-center justify-between w-full bg-white border border-gray-200 rounded-2xl shadow-md p-4">
       {/* Tombol toggle */}
       <button
         onClick={toggleSurveyAccess}

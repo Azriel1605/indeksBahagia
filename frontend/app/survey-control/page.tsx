@@ -16,6 +16,7 @@ import { CardContent, CardDescription, CardHeader, CardTitle } from "@/component
 import SurveyHarianReponse from "./reponse-harian"
 import SurveyAccessHarianButton from "./survey-harian-control"
 import SurveyAccessMingguanButton from "./survey-mingguan-control"
+import SurveyMingguanResponse from "./response-mingguan"
 
 function InputDataContent() {
   type TabType = "harian" | "mingguan";
@@ -61,6 +62,8 @@ function InputDataContent() {
           </TabsContent>
           <TabsContent value="mingguan">
             <SurveyAccessMingguanButton />
+            <br />
+            <SurveyMingguanResponse />
           </TabsContent>
         </Tabs>
       </div>

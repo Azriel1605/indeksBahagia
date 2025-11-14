@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/use-auth"
 interface RouteGuardProps {
   children: React.ReactNode
   requireAuth?: boolean
-  allowedRoles?: ("user" | "guru"| "admin")[]
+  allowedRoles?: ("guest" | "user" | "guru" | "admin" | null)[]
   redirectTo?: string
 }
 
@@ -22,8 +22,13 @@ export default function RouteGuard({ children, requireAuth = false, allowedRoles
       if (requireAuth && !isLoggedIn) {
         router.push(redirectTo)
       } else if (!requireAuth && isLoggedIn && redirectTo === "/login") {
-        // If user is logged in and trying to access login page, redirect to dashboard
-        router.push("/dashboard")
+        // If user is logged in and trying to access login page, redirect to home
+        router.push("/")
+      }
+
+      if (requireAuth && isLoggedIn && !allowedRoles.includes(role)) {
+        router.push("/unauthorized") // arahkan ke halaman tidak punya akses
+        return
       }
     }
   }, [isLoggedIn, isLoading, requireAuth, redirectTo, router])

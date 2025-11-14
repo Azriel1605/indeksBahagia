@@ -13,14 +13,14 @@ interface CounterProps{
 }
 
 
-export default function SurveyHarianReponse() {
+export default function SurveyMingguanResponse() {
     const [counter, setCounter] = useState<CounterProps>({ count: undefined });
 
   const fetchCounter = async () => {
     try {
         const [shiResponse, counterResponse] = await Promise.all([
-        dataAPI.getSHIToday("harian"),
-        dataAPI.counterSubmit("harian")
+        dataAPI.getSHIToday("mingguan"),
+        dataAPI.counterSubmit("mingguan")
         ]);
 
         const [shiData, counterData] = await Promise.all([

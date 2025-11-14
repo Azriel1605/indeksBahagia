@@ -112,4 +112,21 @@ export const dataAPI = {
   validInput: (type: "harian" | "mingguan") =>
     apiCall(`/api/valid-input/${type}`),
 
+  counterSubmit: (type: "harian" | "mingguan") =>
+  apiCall("/api/counter-submit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ type }),
+  }),
+
+  getSHIToday: (type: "harian" | "mingguan") =>
+  apiCall("/api/shi-overall", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ type }),
+  }),
 }

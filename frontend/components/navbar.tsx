@@ -8,28 +8,53 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Home, BarChart3, FileInput, FileText, LogIn, LogOut, User, Menu, X, ListCheckIcon, Table, ListOrdered, ListOrderedIcon } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 
+const navItems = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/dashboard", label: "Dashboard", icon: BarChart3, requireAuth: true, requireRole: ["admin", "guru"] },
+  { href: "/survey-control", label: "Survey", icon: ListCheckIcon, requireAuth: true, requireRole: ["admin", "guru"] },
+  { href: "/survey", label: "Survey", icon: ListCheckIcon, requireAuth: true, requireRole: ["user"] },
+  { href: "/data-siswa", label: "Lihat Data", icon: ListOrderedIcon, requireAuth: true, requireRole: ["admin", "guru"] },
+];
+
 export default function Navbar() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const { user, isLoggedIn, logout, role } = useAuth()
-  const pathname = usePathname()
+  const { isLoggedIn, role, user, logout } = useAuth();
+  const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navItems = [
-    { href: "/", label: "Home", icon: Home, requireAuth: true },
-    { href: "/dashboard", label: "Dashboard", icon: BarChart3, requireAuth: true },
-    { href: "/survey-control", label: "Survey", icon: ListCheckIcon, requireAuth: true },
-    { href: "/data-siswa", label: "Lihat Data", icon: ListOrderedIcon, requireAuth: true },
-  ]
+  const isActive = (href: string) => pathname === href;
 
-  const isActive = (href: string) => pathname === href
+  const hasAccess = (item: any) => {
+    // Jika tidak butuh auth, selalu tampil
+    if (!item.requireAuth) return true;
+
+    // Jika butuh login tapi user belum login
+    if (item.requireAuth && !isLoggedIn) return false;
+
+    // Jika tidak punya batasan role, tampilkan
+    if (!item.requireRole) return true;
+
+    // Jika requireRole adalah string tunggal
+    if (typeof item.requireRole === "string") {
+      return role === item.requireRole;
+    }
+
+    // Jika requireRole adalah array → cek apakah role user termasuk di dalamnya
+    if (Array.isArray(item.requireRole)) {
+      return item.requireRole.includes(role);
+    }
+
+    return false;
+  };
 
   return (
     <nav className="bg-white shadow-lg border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
+          {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex-shrink-0 flex items-center">
               <div className="h-8 w-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <img src="/app-logo.jpg" alt="Logo APK" className="" />
+                <img src="/app-logo.jpg" alt="Logo APK" />
               </div>
               <span className="ml-2 text-xl font-bold text-gray-900">HappinessIndex</span>
             </Link>
@@ -38,8 +63,7 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-4">
             {navItems.map((item) => {
-              if (item.requireAuth && !isLoggedIn) return null
-              if (item.requireAuth && role ==="guru")
+              if (!hasAccess(item)) return null;
 
               return (
                 <Link
@@ -54,9 +78,10 @@ export default function Navbar() {
                   <item.icon className="h-4 w-4 mr-2" />
                   {item.label}
                 </Link>
-              )
+              );
             })}
 
+            {/* User Dropdown */}
             {isLoggedIn ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -82,9 +107,13 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
@@ -95,7 +124,7 @@ export default function Navbar() {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t">
               {navItems.map((item) => {
-                if (item.requireAuth && !isLoggedIn) return null
+                if (!hasAccess(item)) return null;
 
                 return (
                   <Link
@@ -111,7 +140,7 @@ export default function Navbar() {
                     <item.icon className="h-5 w-5 mr-3" />
                     {item.label}
                   </Link>
-                )
+                );
               })}
 
               {isLoggedIn ? (
@@ -145,5 +174,5 @@ export default function Navbar() {
         )}
       </div>
     </nav>
-  )
+  );
 }
