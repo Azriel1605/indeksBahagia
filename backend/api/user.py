@@ -13,15 +13,25 @@ bcrypt = Bcrypt()
 def create_dummy():
     
     user = User(
-    username='user',
-    email='user@gmail.com',
-    password_hash=bcrypt.generate_password_hash('user123').decode('utf-8'),
-    role='user',
-    kode='AS-616',
-    kelas='10'
+        username='user',
+        email='user@gmail.com',
+        password_hash=bcrypt.generate_password_hash('user123').decode('utf-8'),
+        role='user',
+        kode='AS-616',
+        kelas='10'
+    )
+    
+    admin = User(
+        username='admin',
+        email='adminnnn@gmail.com',
+        password_hash=bcrypt.generate_password_hash('admin123').decode('utf-8'),
+        role='admin',
+        kode='AS-615',
+        kelas='10'
     )
     
     db.session.add(user)
+    db.session.add(admin)
     db.session.commit()
     
     return jsonify({'authenticated': False}), 200
@@ -80,6 +90,33 @@ def logout():
 def reset_password():
     
     return jsonify({}), 200
+
+@api.route('/access-classes', methods=['GET'])
+def access_classes():
+    role = session.get('role')
+    kelas = session.get('kelas')
+    
+    if not role or not kelas:
+        return jsonify({'message': 'error'}), 400
+    if role in ['admin', 'superadmin']:
+        access = db.session.query(User.kelas).distinct().all()
+        
+        kelasList = [
+            {
+                "label": k[0],
+                "value": k[0]
+            }
+            for k in access
+        ]
+        kelasList.insert(0, {"label": "Semua Kelas", "value": "Semua Kelas"})
+        
+        return jsonify(kelasList), 200
+    
+    
+    return jsonify([{
+        'label': kelas,
+        'value': kelas
+    }]), 200
 
 @api.route('/forgot-password', methods=['POST'])
 def forgot_password():

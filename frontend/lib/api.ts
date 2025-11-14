@@ -77,7 +77,9 @@ export const dataAPI = {
     return apiCall(`/api/lansia?${params}`)
   },
 
-  getLansiaDetail: (id: number) => apiCall(`/api/lansia/${id}`),
+
+  getAccessClass: () =>
+    apiCall("/api/access-classes"),
 
   submitSurveyHarian: (data: any) =>
     apiCall("/api/submit-form-harian", {
@@ -129,4 +131,22 @@ export const dataAPI = {
     },
     body: JSON.stringify({ type }),
   }),
+
+  getOpenQuestion: (type: "harian" | "mingguan") =>
+    apiCall("/api/word-cloud", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ type }),
+    }),
+
+  getAlerts: (kelas: string, date: string) =>
+    apiCall("/api/get-alerts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ kelas, date }),
+    }),
 }
