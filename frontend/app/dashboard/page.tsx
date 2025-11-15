@@ -2,11 +2,16 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
+import LineChartSekolah from "@/components/ui/line-chart"
 import { dataAPI } from "@/lib/api"
 import RouteGuard from "@/components/route-guard"
 import AlertDashboard from "./alert"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import BarChartSHI from "@/components/ui/barchart"
+import Top5TrenMenurun from "./tren-menurun"
+import AlertSummary from "./alert-summary"
+import HeatmapKebahagiaan from "./heatmap"
+import WordCloud from "@/components/word-cloud"
 
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
@@ -97,6 +102,41 @@ function DashboardContent() {
         )}
 
       </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <div className="col-span-1">
+            <BarChartSHI />
+          </div>
+
+          <div className="col-span-1">
+            <AlertSummary />
+            <Top5TrenMenurun data={[{ kode: "A11", trend: -18, lastScore: 75 }]} />
+          </div>
+
+        </div>
+
+        <HeatmapKebahagiaan students={["A11", "A12", "A13"]} dates={
+          [
+  "01 Jan", "02 Jan", "03 Jan", "04 Jan", "05 Jan",
+  "06 Jan", "07 Jan", "08 Jan", "09 Jan", "10 Jan",
+  "11 Jan", "12 Jan", "13 Jan", "14 Jan", "15 Jan",
+  "16 Jan", "17 Jan", "18 Jan", "19 Jan", "20 Jan",
+  "21 Jan", "22 Jan", "23 Jan", "24 Jan", "25 Jan",
+  "26 Jan", "27 Jan", "28 Jan", "29 Jan", "30 Jan"
+]
+        } values={
+          [
+  Array.from({ length: 30 }, () => Math.floor(Math.random() * 100)), // A11
+  Array.from({ length: 30 }, () => Math.floor(Math.random() * 100)), // A12
+  Array.from({ length: 30 }, () => Math.floor(Math.random() * 100)), // A13
+]
+        } />
+
+        
+      </div>
+
+
     </div>
   )
 

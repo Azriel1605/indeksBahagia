@@ -26,15 +26,23 @@ const dataMingguan = [
   { name: "Minggu 4", value: 74 },
 ];
 
-export default function LineChartSekolah() {
+interface LineChartProps {
+  chartHeight?: number;    // tinggi chart
+  fontSize?: number;       // ukuran teks axis & legend
+  dotSize?: number;        // ukuran titik line
+}
+
+export default function LineChartSekolah({
+  chartHeight = 220,
+  fontSize = 10,
+  dotSize = 4,
+}: LineChartProps) {
   const [mode, setMode] = useState("harian");
   const data = mode === "harian" ? dataHarian : dataMingguan;
 
   return (
     <div className="p-6 bg-slate-100 rounded-2xl shadow-md text-center">
-      <h2 className="text-2xl font-semibold mb-4">
-        Line Chart Tren Harian & Mingguan Sekolah
-      </h2>
+      <h2 className="text-xl font-semibold mb-4">Line Chart Tren Sekolah</h2>
 
       <div className="flex justify-center gap-2 mb-6">
         <button
@@ -60,33 +68,40 @@ export default function LineChartSekolah() {
       </div>
 
       <div className="bg-orange-500 rounded-2xl p-4">
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#fff4" />
-            <XAxis dataKey="name" tick={{ fill: "#fff" }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#ffffff40" />
+            <XAxis
+              dataKey="name"
+              tick={{ fill: "#fff", fontSize }}
+            />
             <YAxis
               domain={[0, 100]}
               tickFormatter={(val) => `${val}%`}
-              tick={{ fill: "#fff" }}
+              tick={{ fill: "#fff", fontSize }}
             />
             <Tooltip
               contentStyle={{
                 backgroundColor: "white",
                 borderRadius: "8px",
+                fontSize,
               }}
-              formatter={(v) => `${v}%`}
+              formatter={(value) => `${value}%`}
             />
             <Line
               type="monotone"
               dataKey="value"
               stroke="#fff"
-              strokeWidth={3}
-              dot={{ fill: "#fff", r: 6 }}
+              strokeWidth={2}
+              dot={{ r: dotSize, fill: "#fff" }}
             />
           </LineChart>
         </ResponsiveContainer>
 
-        <div className="flex justify-around mt-4 flex-wrap gap-2">
+        <div
+          className="flex justify-around mt-4 flex-wrap gap-2"
+          style={{ fontSize }}
+        >
           {data.map((d, i) => (
             <div
               key={i}
