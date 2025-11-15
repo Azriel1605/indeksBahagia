@@ -1,40 +1,61 @@
 import React, { useEffect, useState } from "react";
+import { dataAPI } from "@/lib/api";
 
 interface HeatmapProps {
-  students: string[];
-  dates: string[];
-  values: number[][];
+  kelas: string;
+  date: string;
 }
 
-export default function HeatmapKebahagiaan({ students, dates, values }: HeatmapProps) {
+export default function HeatmapKebahagiaan({
+  kelas,
+  date = new Date().toISOString().split("T")[0]
+}: HeatmapProps){
+  const [students, setStudents] = useState<string[]>([]);
+  const [datesList, setDatesList] = useState<string[]>([]);
+  const [values, setValues] = useState<Record<string, Record<string, number | null>>>({});
+  const [totalStudents, setTotalStudents] = useState<number>(0);
+
+  // Pagination
+  const [page, setPage] = useState<number>(1);
+  const limit = 20;
+
+  // Screen size detection
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
-    const checkSize = () => {
-      setIsSmallScreen(window.innerWidth < 768); // < 768px = HP / layar kecil
-    };
-
-    checkSize(); 
+    const checkSize = () => setIsSmallScreen(window.innerWidth < 768);
+    checkSize();
     window.addEventListener("resize", checkSize);
     return () => window.removeEventListener("resize", checkSize);
   }, []);
 
-  // Jika layar terlalu kecil → tampilkan pesan
-  if (isSmallScreen) {
-    return (
-      <div className="bg-yellow-50 border border-yellow-300 p-4 rounded-xl text-yellow-800 text-center shadow-md">
-        <p className="font-semibold text-sm">
-          Heatmap tidak dapat ditampilkan pada layar kecil.
-        </p>
-        <p className="text-xs mt-1">
-          Silakan buka halaman ini menggunakan laptop atau tablet untuk tampilan lengkap.
-        </p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchHeatmap(page);
+  }, [page, kelas, date]);
 
-  // Konversi nilai ke warna
-  const getColor = (value: number) => {
+  // Fetch Data
+  const fetchHeatmap = async (pageNumber: number) => {
+    try {
+      const response = await dataAPI.getHeatMap(kelas|| "", date, pageNumber, limit);
+      const json = await response.json();
+
+      // console.log("JSON :: ", json)
+
+      setStudents(json.students || []);
+      setDatesList(json.dates || []);
+      setValues(json.values || {});
+      setTotalStudents(json.total_students || 0);
+    } catch (error) {
+      console.error("Error loading heatmap:", error);
+    }
+  };
+
+  // Pagination Control
+  const totalPages = Math.ceil(totalStudents / limit);
+
+  const getColor = (value: number | null) => {
+    console.log("VALUES FOR COLOR", value)
+    if (value === null) return "bg-gray-200";
     if (value >= 85) return "bg-green-500";
     if (value >= 70) return "bg-green-300";
     if (value >= 50) return "bg-yellow-300";
@@ -42,35 +63,75 @@ export default function HeatmapKebahagiaan({ students, dates, values }: HeatmapP
     return "bg-red-500";
   };
 
+  // 📱 Small-Screen Warning
+  if (isSmallScreen) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-300 p-4 rounded-xl text-yellow-800 text-center shadow-md">
+        <p className="font-semibold text-sm">Heatmap tidak dapat ditampilkan pada layar kecil.</p>
+        <p className="text-xs mt-1">Silakan buka halaman ini menggunakan laptop atau tablet.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white p-4 rounded-xl shadow-md w-full overflow-auto">
-      <h2 className="text-lg font-semibold mb-4">Heatmap Kebahagiaan per Kelas</h2>
+      <h2 className="text-lg font-semibold mb-4">
+        Heatmap Kebahagiaan per Kelas (Page {page}/{totalPages})
+      </h2>
 
-      <div className="grid" style={{ gridTemplateColumns: `150px repeat(${dates.length}, 1fr)` }}>
-        
-        {/* Header kolom */}
+      {/* ===================== TABLE GRID ====================== */}
+      <div className="grid" style={{ gridTemplateColumns: `150px repeat(${datesList.length}, 1fr)` }}>
+
+        {/* Header Dates */}
         <div className="font-semibold text-sm text-gray-700 border-b pb-2">Siswa</div>
-        {dates.map((date, i) => (
-          <div key={i} className="text-xs text-gray-600 text-center border-b pb-2">
-            {date}
-          </div>
+        {datesList.map((d, i) => (
+          <div key={i} className="text-xs text-gray-600 text-center border-b pb-2">{d}</div>
         ))}
 
-        {/* Baris siswa */}
-        {students.map((student, row) => (
-          <>
-            <div key={`name-${row}`} className="text-sm font-medium py-2 border-b">
-              {student}
-            </div>
+        {/* Student Rows */}
+        {students.map((student, i) => (
+          <React.Fragment key={student}>
+            <div className="text-sm font-medium py-2 border-b">{student}</div>
 
-            {values[row].map((val, col) => (
-              <div
-                key={`cell-${row}-${col}`}
-                className={`h-8 border-b border-r ${getColor(val)}`}
-              ></div>
-            ))}
-          </>
+            {datesList.map((d, j) => {
+              const value = values?.[i]?.[j] ?? null;
+
+              return (
+                <div
+                  key={`${student}-${d}`}
+                  className={`h-8 border-b border-r flex items-center justify-center text-[10px] font-semibold ${getColor(value)}`}
+                >
+                  {value !== null ? value : ""}
+                </div>
+              );
+            })}
+
+          </React.Fragment>
         ))}
+
+      </div>
+
+      {/* ===================== PAGINATION ====================== */}
+      <div className="flex justify-center items-center gap-4 mt-4">
+        <button
+          disabled={page === 1}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-40"
+          onClick={() => setPage((p) => p - 1)}
+        >
+          Prev
+        </button>
+
+        <span className="text-sm font-medium">
+          Page {page} / {totalPages}
+        </span>
+
+        <button
+          disabled={page >= totalPages}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-40"
+          onClick={() => setPage((p) => p + 1)}
+        >
+          Next
+        </button>
       </div>
     </div>
   );

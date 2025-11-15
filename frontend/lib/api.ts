@@ -149,4 +149,14 @@ export const dataAPI = {
       },
       body: JSON.stringify({ kelas, date }),
     }),
+
+  getHeatMap: (kelas: string, date: string, page: number = 1, limit: number = 20) =>
+  apiCall("/api/heatmap", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ kelas, date, page, limit }),
+  }),
+
 }

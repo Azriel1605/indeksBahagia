@@ -4,6 +4,7 @@ from model import db, User, RecordSiswaHarian, RecordSiswaMingguan
 from datetime import date, datetime, timedelta
 from sqlalchemy import func, or_
 from sqlalchemy.sql import over
+import math
 
 
 @api.route('/word-cloud', methods=["POST"])
@@ -73,9 +74,119 @@ def shi_overall():
         'shi': avg
     }), 200
 
-# @api.route('/heatmap', methods=["GET"])
-# def heatmap():
-#     return jsonify({}), 200
+@api.route('/heatmap', methods=["POST"])
+def heatmap():
+    data = request.get_json()
+    kelas = data.get('kelas')
+    end_date = data.get('date')
+    page = int(data.get('page', 1))
+    limit = int(data.get('limit', 20))
+
+    if not kelas or not end_date:
+        return jsonify({"message": "kelas and date are required"}), 400
+
+    # Convert end_date string → date object
+    end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+    start_date = end_date - timedelta(days=30 - 1)
+
+    # Filter kelas
+    if kelas == "Semua Kelas":
+        kelas_filter = True
+    else:
+        kelas_filter = (User.kelas == kelas)
+
+    # Ambil siswa yang cocok
+    students_query = db.session.query(User.id, User.kode).filter(kelas_filter, User.role == "user")
+
+    total_students = students_query.count()
+    total_pages = math.ceil(total_students / limit)
+
+    # Pagination database (supaya ringan)
+    students = (
+        students_query
+        .order_by(User.kode)
+        .offset((page - 1) * limit)
+        .limit(limit)
+        .all()
+    )
+
+    if not students:
+        return jsonify({
+            "students": [],
+            "dates": [],
+            "values": [],
+            "total_students": 0,
+            "total_pages": 0
+        }), 200
+
+    student_ids = [s.id for s in students]
+    student_map = {s.id: s.kode for s in students}
+
+    # Ambil semua record 30 hari untuk siswa ini
+    records = (
+        RecordSiswaHarian.query
+        .filter(
+            RecordSiswaHarian.user_id.in_(student_ids),
+            func.date(RecordSiswaHarian.date).between(start_date, end_date)
+        )
+        .with_entities(
+            RecordSiswaHarian.user_id,
+            func.date(RecordSiswaHarian.date),
+            RecordSiswaHarian.skor
+        )
+        .all()
+    )
+
+    # Format daftar tanggal
+    date_list = []
+    current = start_date
+    while current <= end_date:
+        date_list.append(current.strftime("%d %b"))
+        current += timedelta(days=1)
+
+    # Siapkan struktur array 2 dimensi
+    values = []
+    # values[row][col]  <-- row = siswa, col = tanggal
+
+    # Buat dictionary untuk akses cepat
+    record_map = {f"{uid}-{d.strftime("%d %b")}": skor for uid, d, skor in records}
+
+    values = []  # hasil akhir: list of rows (array 2D)
+
+    # students adalah list of tuples (id, kode)
+    for s_id, s_kode in students:
+        row_values = []
+        for d in date_list:
+            score = record_map.get(f"{s_id}-{d}", None)
+            row_values.append(score)
+        # optional: debugging
+        values.append(row_values)
+
+    valid_columns = []
+
+    for col_idx in range(len(date_list)):
+        # Cek apakah ada minimal satu siswa yang memiliki nilai bukan None di kolom ini
+        any_score = any(row[col_idx] is not None for row in values)
+        if any_score:
+            valid_columns.append(col_idx)
+
+    # Buang tanggal yang semua None
+    date_list = [date_list[i] for i in valid_columns]
+
+    # Buang nilai yang semua None kolomnya
+    values = [
+        [row[i] for i in valid_columns]
+        for row in values
+    ]
+    
+    return jsonify({
+        "students": [s.kode for s in students],
+        "dates": date_list,
+        "values": values,
+        "total_students": total_students,
+        "total_pages": total_pages
+    }), 200
+    
 
 # @api.route('/shi-oervall', methods=["GET"])
 # def shi_overall():
