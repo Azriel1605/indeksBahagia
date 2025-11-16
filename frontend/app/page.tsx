@@ -10,6 +10,7 @@ import Link from "next/link"
 import InfoCard from "@/components/info-card"
 import LineChartSekolah from "@/components/ui/line-chart"
 import BarChartSHI from "@/components/ui/barchart"
+import LineChartHome from "@/components/ui/line-chart-home"
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
 export default function HomePage() {
@@ -126,12 +127,10 @@ export default function HomePage() {
 
         {/* Line Chart and Distribution */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 space-y-4">
-          <LineChartSekolah />
-          <BarChartSHI />
+          <LineChartHome />
+          <BarChartSHI date={new Date().toISOString().slice(0, 10)} />
         </div>
       </div>
-
-
     </div>
   )
 }

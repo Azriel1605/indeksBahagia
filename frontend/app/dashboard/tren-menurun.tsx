@@ -1,4 +1,13 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { dataAPI } from "@/lib/api";
+
+interface ApiResponse {
+  kode: string;
+  latest_score: number;
+  trend: number;
+}
 
 interface StudentTrend {
   kode: string;
@@ -7,26 +16,70 @@ interface StudentTrend {
 }
 
 interface Top5Props {
-  data: StudentTrend[];
+  kelas: string;
+  date: string;
   title?: string;
   fontSize?: string;
 }
 
 export default function Top5TrenMenurun({
-  data,
+  kelas,
+  date,
   title = "Top 5 Siswa dengan Tren Menurun",
   fontSize = "text-sm",
 }: Top5Props) {
-  // Ambil 5 data pertama
-  const filledRows = [...data.slice(0, 5)];
+  const [data, setData] = useState<StudentTrend[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Isi kekurangan dengan placeholder "-"
+  // Fetch data dari API
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      try {
+        const response = await dataAPI.getTopLowTren(kelas, date);
+        const result: ApiResponse[] = await response.json();
+
+        // mapping field API → komponen
+        const mapped: StudentTrend[] = result.map((r) => ({
+          kode: r.kode,
+          trend: r.trend,
+          lastScore: r.latest_score,
+        }));
+
+        setData(mapped);
+      } catch (err) {
+        console.error("Failed fetch trend:", err);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+      const interval = setInterval(fetchData, 60000); // panggil ulang setiap 5 detik
+      return () => clearInterval(interval)
+    };
+
+    fetchData();
+  }, [kelas, date]);
+
+  // Loading dummy 5 row
+  if (loading) {
+    return (
+      <div className="bg-white p-4 rounded-xl shadow-md w-full animate-pulse">
+        <h2 className="text-lg font-semibold mb-3">{title}</h2>
+
+        <div className="space-y-2">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="h-6 bg-gray-200 rounded"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Ambil 5 item atau isi placeholder
+  const filledRows = [...data.slice(0, 5)];
   while (filledRows.length < 5) {
-    filledRows.push({
-      kode: "-",
-      trend: 0,
-      lastScore: 0,
-    });
+    filledRows.push({ kode: "-", trend: 0, lastScore: 0 });
   }
 
   return (
@@ -56,7 +109,7 @@ export default function Top5TrenMenurun({
                     isPlaceholder ? "text-gray-400" : ""
                   }`}
                 >
-                  {isPlaceholder ? "-" : siswa.kode}
+                  {siswa.kode}
                 </td>
 
                 <td

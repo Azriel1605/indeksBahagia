@@ -2,7 +2,7 @@ from flask import request, jsonify, session
 from . import api
 from model import db, User, RecordSiswaHarian, RecordSiswaMingguan
 from datetime import date, datetime, timedelta
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, cast, Date
 from sqlalchemy.sql import over
 import math
 
@@ -186,19 +186,7 @@ def heatmap():
         "total_students": total_students,
         "total_pages": total_pages
     }), 200
-    
 
-# @api.route('/shi-oervall', methods=["GET"])
-# def shi_overall():
-#     return jsonify({}), 200
-
-# @api.route('/distribusi-kelas', methods=["GET"])
-# def distribusi_kelas():
-#     return jsonify({}), 200
-
-# @api.route('/alert-counter', methods=["GET"])
-# def alert_counter():
-#     return jsonify({}), 200
 
 @api.route('/get-alerts', methods=["POST"])
 def alert_counter():
@@ -309,3 +297,142 @@ def alert_counter():
         'alert2': len(alert2),
         'alert3': len(alert3)
     }), 200
+
+
+@api.route('/get-top-low-tren', methods=["POST"])
+def get_top_low_tren():
+    data = request.get_json()
+    kelas = data.get('kelas')
+    date = data.get('date')
+
+    if not kelas or not date:
+        return jsonify({"message": "kelas and date are required"}), 400
+    
+    
+    # Filter kelas
+    if kelas == "Semua Kelas":
+        kelas_filter = True
+    else:
+        kelas_filter = (User.kelas == kelas)
+    date = datetime.strptime(date, "%Y-%m-%d").date()
+    seven_days_ago = date - timedelta(days=7)
+
+    # Skor terbaru
+    latest_score_sq = (
+        db.session.query(
+            RecordSiswaHarian.user_id.label("user_id"),
+            func.max(RecordSiswaHarian.date).label("latest_date")
+        )
+        .group_by(RecordSiswaHarian.user_id)
+        .subquery()
+    )
+
+    latest_data_sq = (
+        db.session.query(
+            RecordSiswaHarian.user_id.label("user_id"),
+            RecordSiswaHarian.skor.label("latest_score")
+        )
+        .join(
+            latest_score_sq,
+            (RecordSiswaHarian.user_id == latest_score_sq.c.user_id) &
+            (RecordSiswaHarian.date == latest_score_sq.c.latest_date)
+        )
+        .subquery()
+    )
+
+    # Skor 7 hari lalu
+    old_score_sq = (
+        db.session.query(
+            RecordSiswaHarian.user_id.label("user_id"),
+            func.min(RecordSiswaHarian.date).label("old_date")  # data terlama di window 7 hari
+        )
+        .filter(
+            RecordSiswaHarian.date >= seven_days_ago,
+            RecordSiswaHarian.date < date  # sebelum nilai terbaru
+        )
+        .group_by(RecordSiswaHarian.user_id)
+        .subquery()
+    )
+
+
+    old_data_sq = (
+    db.session.query(
+        RecordSiswaHarian.user_id.label("user_id"),
+        RecordSiswaHarian.skor.label("old_score")
+    )
+    .join(
+        old_score_sq,
+        (RecordSiswaHarian.user_id == old_score_sq.c.user_id) &
+        (RecordSiswaHarian.date == old_score_sq.c.old_date)
+    )
+    .subquery()
+)
+
+
+    # Query utama + FILTER kelas
+    records = (
+        db.session.query(
+            User.kode.label("kode"),
+            User.kelas.label("kelas"),
+            latest_data_sq.c.latest_score.label("latest_score"),
+            (latest_data_sq.c.latest_score - old_data_sq.c.old_score).label("trend")
+        )
+        .join(latest_data_sq, latest_data_sq.c.user_id == User.id)
+        .join(old_data_sq, old_data_sq.c.user_id == User.id)
+        .filter(kelas_filter)   # ⬅️ Filter kelas di sini
+        .filter((latest_data_sq.c.latest_score - old_data_sq.c.old_score) < 0)
+        .order_by((latest_data_sq.c.latest_score - old_data_sq.c.old_score))
+        .limit(5)
+        .all()
+    )
+
+    # Convert ke JSON
+    result_json = [
+        {
+            "kode": r.kode,
+            "kelas": r.kelas,
+            "latest_score": float(r.latest_score),
+            "trend": float(r.trend)
+        }
+        for r in records
+    ]
+
+    return jsonify(result_json)
+
+@api.route('/get-barchart', methods=["POST"])
+def get_barchart():
+    data = request.get_json()
+    date = data.get('date')
+
+    if not date:
+        return jsonify({"error": "Parameter 'tanggal' wajib diisi. Format: YYYY-MM-DD"}), 400
+
+    try:
+        tanggal = datetime.strptime(date, "%Y-%m-%d").date()
+    except:
+        return jsonify({"error": "invalid date format, use YYYY-MM-DD"}), 400
+
+    # Query: join Record + User lalu group by kelas
+    result = (
+        db.session.query(
+            User.kelas.label("kelas"),
+            func.avg(RecordSiswaHarian.skor).label("nilai")
+        )
+        .join(User, User.id == RecordSiswaHarian.user_id)
+        .filter(RecordSiswaHarian.date < tanggal)
+        .group_by(User.kelas)
+        .order_by(User.kelas)
+        .all()
+    )
+
+    response = [
+        {
+            "kelas": row.kelas,
+            "nilai": round(row.nilai, 2)
+        }
+        for row in result
+    ]
+    print("BAR CHART")
+    print(response)
+
+    return jsonify(response), 200

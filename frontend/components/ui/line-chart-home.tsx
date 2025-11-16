@@ -1,4 +1,5 @@
-// 📁 components/ui/line-chart-sekolah.tsx
+// 📁 components/ui/line-chart-home.tsx
+// (Komponen baru untuk homepage, TIDAK memerlukan props)
 
 import React, { useState, useEffect } from "react"
 import {
@@ -13,8 +14,8 @@ import {
 import { dataAPI } from "@/lib/api" // Import API Anda
 import { Loader2 } from "lucide-react"
 
+// Props tidak lagi diperlukan
 interface LineChartProps {
-  userId: number // ID siswa untuk mengambil data tren
   chartHeight?: number
   fontSize?: number
   dotSize?: number
@@ -25,8 +26,8 @@ interface TrendData {
   value: number
 }
 
-export default function LineChartSekolah({
-  userId,
+// Ubah nama fungsi dan hapus 'userId' dari props
+export default function LineChartHome({
   chartHeight = 220,
   fontSize = 10,
   dotSize = 4,
@@ -43,10 +44,10 @@ export default function LineChartSekolah({
       setIsLoading(true)
       setError(null)
       try {
-        // Panggil kedua endpoint
+        // Panggil kedua endpoint PUBLIK baru
         const [harianRes, mingguanRes] = await Promise.all([
-          dataAPI.getSiswaTrendHarian(userId),
-          dataAPI.getSiswaTrendMingguan(userId),
+          dataAPI.getOverallTrendHarian(),  // <-- MODIFIED
+          dataAPI.getOverallTrendMingguan(), // <-- MODIFIED
         ])
 
         if (harianRes.ok) {
@@ -69,38 +70,41 @@ export default function LineChartSekolah({
       }
     }
 
-    if (userId) {
-      fetchChartData()
-    }
-  }, [userId]) // Ambil ulang data jika ID siswa berubah
+    // Hapus 'if (userId)' dan panggil fetchChartData() saat mount
+    fetchChartData()
+    
+  }, []) // Dependency array diubah menjadi [] (hanya jalan sekali)
 
   const data = mode === "harian" ? harianData : mingguanData
 
   if (isLoading) {
+    // ... (Loading state sama)
     return (
-      <div
-        className="flex items-center justify-center p-6 bg-slate-100 rounded-2xl shadow-md"
-        style={{ height: chartHeight + 150 }} // Sesuaikan tinggi
-      >
-        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-      </div>
+        <div
+            className="flex items-center justify-center p-6 bg-slate-100 rounded-2xl shadow-md"
+            style={{ height: chartHeight + 150 }}
+        >
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+        </div>
     )
   }
 
   if (error) {
+    // ... (Error state sama)
     return (
-      <div
-        className="flex items-center justify-center p-6 bg-red-100 text-red-700 rounded-2xl shadow-md"
-        style={{ height: chartHeight + 150 }}
-      >
-        <p>{error}</p>
-      </div>
+        <div
+            className="flex items-center justify-center p-6 bg-red-100 text-red-700 rounded-2xl shadow-md"
+            style={{ height: chartHeight + 150 }}
+        >
+            <p>{error}</p>
+        </div>
     )
   }
 
   return (
     <div className="p-6 bg-slate-100 rounded-2xl shadow-md text-center">
-      <h2 className="text-xl font-semibold mb-4">Line Chart Tren Siswa</h2>
+      {/* Judul diubah */}
+      <h2 className="text-xl font-semibold mb-4">Line Chart Tren Keseluruhan</h2>
 
       <div className="flex justify-center gap-2 mb-6">
         <button
@@ -146,7 +150,7 @@ export default function LineChartSekolah({
                     borderRadius: "8px",
                     fontSize,
                   }}
-                  formatter={(value: number) => [`${value.toFixed(2)}%`, "Skor"]}
+                  formatter={(value: number) => [`${value.toFixed(2)}%`, "Rata-rata Skor"]}
                 />
                 <Line
                   type="monotone"

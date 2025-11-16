@@ -56,11 +56,10 @@ export default function HeatmapKebahagiaan({
   const getColor = (value: number | null) => {
     console.log("VALUES FOR COLOR", value)
     if (value === null) return "bg-gray-200";
-    if (value >= 85) return "bg-green-500";
-    if (value >= 70) return "bg-green-300";
-    if (value >= 50) return "bg-yellow-300";
-    if (value >= 30) return "bg-orange-400";
-    return "bg-red-500";
+    if (value >= 80) return "bg-[#3B82F6]";
+    if (value >= 60) return "bg-[#5BE12C]";
+    if (value >= 40) return "bg-[#F5CD19]";
+    return "bg-[#EA4228]";
   };
 
   // 📱 Small-Screen Warning

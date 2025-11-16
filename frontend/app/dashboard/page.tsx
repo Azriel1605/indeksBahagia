@@ -25,10 +25,12 @@ function DashboardContent() {
   const [classOptions, setClassOptions] = useState<ClassOption[]>([]);
   const [selectedClass, setSelectedClass] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // ---- FETCH DATA KELAS DARI API ----
   const fetchClassOptions = async () => {
     try {
+      setIsLoading(true)
       const res = await dataAPI.getAccessClass();// ganti dengan endpoint kamu
       const data = await res.json();
 
@@ -44,6 +46,8 @@ function DashboardContent() {
 
     } catch (error) {
       console.error("Error fetching class options:", error);
+    } finally{
+      setIsLoading(false)
     }
   };
 
@@ -55,6 +59,19 @@ function DashboardContent() {
 
   console.log("Effect runs with:", { selectedClass, selectedDate });
   }, []);
+
+  
+  if (isLoading){
+    return(
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          <p className="mt-4 text-gray-600">Memuat data...</p>
+        </div>
+      </div>
+    )
+  }
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -100,12 +117,12 @@ function DashboardContent() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           <div className="col-span-1">
-            <BarChartSHI />
+            <BarChartSHI date={selectedDate} />
           </div>
 
           <div className="col-span-1">
             <AlertSummary kelas={selectedClass as any} date={selectedDate}/>
-            <Top5TrenMenurun data={[{ kode: "A11", trend: -18, lastScore: 75 }]} />
+            <Top5TrenMenurun  kelas={selectedClass as any} date={selectedDate} />
           </div>
 
         </div>

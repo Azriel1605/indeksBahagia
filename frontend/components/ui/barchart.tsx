@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -9,82 +9,87 @@ import {
   Cell,
   CartesianGrid,
 } from "recharts";
+import { dataAPI } from "@/lib/api";
 
-// ==================
-// 🔹 Type Definition
-// ==================
 interface SHIData {
   kelas: string;
   nilai: number;
 }
 
-// ==================
-// 🔹 Dummy Data
-// ==================
-const data: SHIData[] = [
-  { kelas: "X IPA 1", nilai: 35 },
-  { kelas: "X IPA 2", nilai: 52 },
-  { kelas: "X IPS 1", nilai: 68 },
-  { kelas: "XI IPA 1", nilai: 74 },
-  { kelas: "XI IPS 1", nilai: 81 },
-  { kelas: "XII IPA 1", nilai: 93 },
-];
+interface Props {
+  date: string; // YYYY-MM-DD
+}
 
-// ==================
-// 🔹 Fungsi Warna SHI
-// ==================
 const getColor = (v: number): string => {
-  if (v < 40) return "#EF4444"; // Merah
-  if (v < 60) return "#FACC15"; // Kuning
-  if (v < 80) return "#22C55E"; // Hijau
-  return "#3B82F6"; // Biru
+  if (v < 40) return "#EF4444"; 
+  if (v < 60) return "#FACC15"; 
+  if (v < 80) return "#22C55E"; 
+  return "#3B82F6"; 
 };
 
-// ==================
-// 🔹 Komponen Utama
-// ==================
-export default function BarChartSHI(){
+export default function BarChartSHI({ date = new Date().toISOString().split('T')[0] }: Props) {
+  const [data, setData] = useState<SHIData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!date) return;
+
+    setLoading(true);
+
+    dataAPI.getBarChart(date)
+      .then((res) => res.json())
+      .then((data) => {
+        setData(data || []);
+      })
+      .finally(() => setLoading(false));
+  }, [date]);
+
   return (
     <div className="p-6 bg-white rounded-2xl shadow-md text-center">
       <h2 className="text-2xl font-semibold mb-4">
         Perbandingan Indeks Kebahagiaan per Kelas
       </h2>
 
-      <ResponsiveContainer width="100%" height={350}>
-        <BarChart
-          data={data}
-          margin={{ top: 30, right: 30, left: 20, bottom: 40 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-          <XAxis
-            dataKey="kelas"
-            tick={{ fontSize: 12 }}
-            angle={-15}
-            textAnchor="end"
-          />
-          <YAxis
-            tick={{ fontSize: 12 }}
-            domain={[0, 100]}
-            label={{
-              value: "Nilai SHI",
-              angle: -90,
-              position: "insideLeft",
-              offset: 10,
-            }}
-          />
-          <Tooltip
-            formatter={(value: number) => [`${value}%`, "SHI"]}
-            cursor={{ fill: "rgba(0,0,0,0.05)" }}
-          />
-          <Bar dataKey="nilai" radius={[6, 6, 0, 0]}>
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={getColor(entry.nilai)} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
+      {loading ? (
+        <div className="text-gray-500">Loading...</div>
+      ) : (
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart data={data} margin={{ top: 30, right: 30, left: 20, bottom: 40 }}>
+            <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
 
-      {/* Legenda Warna */}
+            <XAxis
+              dataKey="kelas"
+              tick={{ fontSize: 12 }}
+              angle={-15}
+              textAnchor="end"
+            />
+
+            <YAxis
+              tick={{ fontSize: 12 }}
+              domain={[0, 100]}
+              label={{
+                value: "Rata-rata SHI",
+                angle: -90,
+                position: "insideLeft",
+                offset: 10,
+              }}
+            />
+
+            <Tooltip
+              formatter={(value: number) => [`${value}%`, "SHI"]}
+              cursor={{ fill: "rgba(0,0,0,0.05)" }}
+            />
+
+            <Bar dataKey="nilai" radius={[6, 6, 0, 0]}>
+              {data.map((entry, i) => (
+                <Cell key={i} fill={getColor(entry.nilai)} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+
+      {/* Legend */}
       <div className="flex justify-center gap-3 mt-6 text-sm">
         <div className="flex items-center gap-1">
           <div className="w-4 h-4 bg-red-500 rounded-sm" /> <span>{"< 40 (Risiko Tinggi)"}</span>
