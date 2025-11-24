@@ -9,34 +9,6 @@ import os
 
 bcrypt = Bcrypt()
 
-@api.route('/create-dummy', methods=['GET'])
-def create_dummy():
-    
-    user = User(
-        username='user',
-        email='user@gmail.com',
-        password_hash=bcrypt.generate_password_hash('user123').decode('utf-8'),
-        role='user',
-        kode='AS-616',
-        kelas='10'
-    )
-    
-    admin = User(
-        username='admin',
-        email='adminnnn@gmail.com',
-        password_hash=bcrypt.generate_password_hash('admin123').decode('utf-8'),
-        role='admin',
-        kode='AS-615',
-        kelas='10'
-    )
-    
-    db.session.add(user)
-    db.session.add(admin)
-    db.session.commit()
-    
-    return jsonify({'authenticated': False}), 200
-
-
 @api.route('/check-auth', methods=['GET'])
 def check_auth():
     if 'user_id' in session:

@@ -1,36 +1,46 @@
 from . import api
+from flask import jsonify
 from flask_bcrypt import Bcrypt
-from flask import jsonify
-
-bcrypt = Bcrypt()
-
-from flask import jsonify
 from faker import Faker
 import random
 from datetime import datetime, timedelta, date
 
 from model import (
+    db,
     User,
-    RecordSiswaHarianPermission,
     RecordSiswaHarian,
-    RecordSiswaMingguanPermission,
     RecordSiswaMingguan,
-    Note,
-    db
+    RecordSiswaHarianPermission,
+    RecordSiswaMingguanPermission,
+    Note
 )
 
-faker = Faker("id_ID")
+bcrypt = Bcrypt()
+faker = Faker("id_ID")  # Menggunakan region Indonesia
 
-def rand5():
-    return random.randint(1, 5)
+# ==========================================
+# KONFIGURASI GENERATOR DATA
+# ==========================================
+TOTAL_SISWA = 50          # Jumlah siswa yang akan dibuat
+TOTAL_GURU = 5            # Jumlah guru
+TOTAL_ADMIN = 2           # Jumlah admin
+RENTANG_HARI = 40         # Data record untuk 40 hari ke belakang
+KELAS_LIST = [            # Daftar kelas SMA
+    "10-1", "10-2", 
+    "11-1", "11-2", 
+    "12-1", "12-2"
+]
+PASSWORD_DEFAULT = "123456" # Password default untuk semua user
 
+# Pilihan untuk Survey Mingguan (sesuai frontend)
+OPSI_TIDUR = ["< 6 jam", "6-7 jam", "7-8 jam", "> 8 jam"]
+OPSI_KEHADIRAN = ["Baik", "Sedang", "Perlu Perbaikan"]
 
-@api.route("/seed-all", methods=["GET"])
-def seed_all():
+@api.route('/generate-dummy-data', methods=['GET'])
+def generate_dummy_data():
     try:
-        # ============================
-        # OPTIONAL: HAPUS DATA LAMA
-        # ============================
+        # 1. BERSIHKAN DATABASE LAMA (Opsional, agar data bersih)
+        # Hati-hati, ini akan menghapus semua data!
         db.session.query(Note).delete()
         db.session.query(RecordSiswaHarian).delete()
         db.session.query(RecordSiswaMingguan).delete()
@@ -39,148 +49,149 @@ def seed_all():
         db.session.query(User).delete()
         db.session.commit()
 
-        # ============================
-        # CONFIG PARAMETER
-        # ============================
-        NUM_ADMIN = 2
-        NUM_GURU = 5
-        NUM_MURID = 40
+        print("--- Database dibersihkan ---")
 
-        KELAS_LIST = ["A1", "A2", "B1", "B2", "C1"]
+        # Hash password sekali saja untuk performa
+        hashed_pw = bcrypt.generate_password_hash(PASSWORD_DEFAULT).decode('utf-8')
 
-        # ============================
-        # BUAT USER (ADMIN, GURU, MURID)
-        # ============================
-        all_users = []
+        users_siswa = []
+        users_guru = []
 
-        # ---- Admin ----
-        for _ in range(NUM_ADMIN):
-            u = User(
-                username=faker.user_name(),
-                email=faker.email(),
-                password_hash="HASHED_DUMMY",
+        # 2. BUAT ADMIN
+        for i in range(TOTAL_ADMIN):
+            admin = User(
+                username=f"admin{i+1}",
+                email=f"admin{i+1}@sekolah.id",
+                password_hash=hashed_pw,
                 role="admin",
-                kode=f"ADM{random.randint(1000,9999)}",
+                kode=f"ADM-{faker.unique.random_number(digits=3)}",
                 kelas=None
             )
-            db.session.add(u)
-            all_users.append(u)
-
-        # ---- Guru ----
-        for _ in range(NUM_GURU):
-            kelas = random.choice(KELAS_LIST)
-            u = User(
-                username=faker.user_name(),
-                email=faker.email(),
-                password_hash="HASHED_DUMMY",
+            db.session.add(admin)
+        
+        # 3. BUAT GURU
+        for i in range(TOTAL_GURU):
+            guru = User(
+                username=f"guru{i+1}",
+                email=f"guru{i+1}@sekolah.id",
+                password_hash=hashed_pw,
                 role="guru",
-                kode=f"GURU{random.randint(1000,9999)}",
-                kelas=kelas
+                kode=f"GRU-{faker.unique.random_number(digits=3)}",
+                kelas=random.choice(KELAS_LIST) # Guru wali kelas acak
             )
-            db.session.add(u)
-            all_users.append(u)
+            db.session.add(guru)
+            users_guru.append(guru)
 
-        # ---- Murid ----
-        murid_list = []
-        for _ in range(NUM_MURID):
-            kelas = random.choice(KELAS_LIST)
-            u = User(
-                username=faker.user_name(),
-                email=faker.email(),
-                password_hash="HASHED_DUMMY",
+        # 4. BUAT SISWA (USER)
+        for i in range(TOTAL_SISWA):
+            kelas_siswa = random.choice(KELAS_LIST)
+            siswa = User(
+                username=f"siswa{i+1}", # Atau faker.user_name()
+                email=f"siswa{i+1}@sekolah.id",
+                password_hash=hashed_pw,
                 role="user",
-                kode=f"MURID{random.randint(1000,9999)}",
-                kelas=kelas
+                kode=f"SIS-{faker.unique.random_number(digits=4)}",
+                kelas=kelas_siswa
             )
-            db.session.add(u)
-            all_users.append(u)
-            murid_list.append(u)
+            db.session.add(siswa)
+            users_siswa.append(siswa)
 
+        # Commit user dulu agar mendapat ID
         db.session.commit()
+        print(f"--- {TOTAL_SISWA} Siswa, {TOTAL_GURU} Guru, {TOTAL_ADMIN} Admin dibuat ---")
 
-        # ============================
-        # PERMISSION SURVEY HARIAN DAN MINGGUAN
-        # ============================
+        # 5. BUKA AKSES SURVEY (PERMISSION)
         for k in KELAS_LIST:
-            db.session.add(RecordSiswaHarianPermission(kelas=k, is_active=True))
-            db.session.add(RecordSiswaMingguanPermission(kelas=k, is_active=True))
-
+            # Izin Harian
+            perm_harian = RecordSiswaHarianPermission(kelas=k, is_active=True)
+            db.session.add(perm_harian)
+            # Izin Mingguan
+            perm_mingguan = RecordSiswaMingguanPermission(kelas=k, is_active=True)
+            db.session.add(perm_mingguan)
+        
         db.session.commit()
 
-        # ============================
-        # RECORD HARIAN untuk Murid
-        # ============================
-        for m in murid_list:
-            for i in range(5):  # 5 hari terakhir
-                tanggal = datetime.now() - timedelta(days=i)
-                r = RecordSiswaHarian(
-                    user_id=m.id,
-                    date=tanggal,
-                    bahagia=rand5(),
-                    semangat=rand5(),
-                    fokus=rand5(),
-                    bertenaga=rand5(),
-                    stress=rand5(),
-                    dukungan_teman=rand5(),
-                    dukungan_guru=rand5(),
-                    aman=rand5(),
-                    rasakan=faker.sentence(),
+        # 6. GENERATE RECORD (HARIAN & MINGGUAN)
+        today = date.today()
+        records_harian = []
+        records_mingguan = []
+
+        for siswa in users_siswa:
+            # Loop mundur dari hari ini ke RENTANG_HARI yang lalu
+            for day_offset in range(RENTANG_HARI):
+                current_date = today - timedelta(days=day_offset)
+                
+                # --- Record Harian (Setiap hari kecuali weekend opsional, disini kita buat full) ---
+                # Randomize values 1-5 (Likert)
+                rec_harian = RecordSiswaHarian(
+                    user_id=siswa.id,
+                    date=current_date,
+                    bahagia=random.randint(2, 5), # Cenderung bahagia agar data variatif
+                    semangat=random.randint(1, 5),
+                    fokus=random.randint(1, 5),
+                    bertenaga=random.randint(1, 5),
+                    stress=random.randint(1, 4),  # Stress rendah -> skor tinggi
+                    dukungan_teman=random.randint(2, 5),
+                    dukungan_guru=random.randint(2, 5),
+                    aman=random.randint(3, 5),
+                    rasakan=faker.sentence() if random.random() > 0.7 else None # 30% isi teks
                 )
-                r.calculate_score()
-                db.session.add(r)
+                # Hitung skor (penting agar tidak null di DB)
+                rec_harian.calculate_score()
+                records_harian.append(rec_harian)
 
+                # --- Record Mingguan (Setiap 7 hari sekali) ---
+                if day_offset % 7 == 0:
+                    is_bullying = 1 if random.random() < 0.1 else 0 # 10% chance bullying
+                    rec_mingguan = RecordSiswaMingguan(
+                        user_id=siswa.id,
+                        date=current_date,
+                        bahagia=random.randint(2, 5),
+                        semangat=random.randint(2, 5),
+                        beban=random.randint(1, 4), # Beban rendah -> skor tinggi
+                        cemas=random.randint(1, 4),
+                        bantuan_guru=random.randint(2, 5),
+                        menghargai=random.randint(3, 5),
+                        aman=random.randint(3, 5),
+                        bullying=is_bullying,
+                        desc_bullying=faker.sentence() if is_bullying == 1 else None,
+                        tidur=random.choice(OPSI_TIDUR),
+                        kehadiran=random.choice(OPSI_KEHADIRAN),
+                        open_question=faker.sentence() if random.random() > 0.5 else None
+                    )
+                    rec_mingguan.calculate_score()
+                    records_mingguan.append(rec_mingguan)
+
+        # Bulk insert untuk performa lebih cepat
+        db.session.add_all(records_harian)
+        db.session.add_all(records_mingguan)
         db.session.commit()
+        print(f"--- Records Harian & Mingguan untuk {RENTANG_HARI} hari terakhir dibuat ---")
 
-        # ============================
-        # RECORD MINGGUAN untuk Murid
-        # ============================
-        for m in murid_list:
-            for i in range(3):  # Minggu terakhir
-                tanggal = datetime.now() - timedelta(days=i * 7)
-                r = RecordSiswaMingguan(
-                    user_id=m.id,
-                    date=tanggal,
-                    bahagia=rand5(),
-                    semangat=rand5(),
-                    beban=rand5(),
-                    cemas=rand5(),
-                    bantuan_guru=rand5(),
-                    menghargai=rand5(),
-                    aman=rand5(),
-                    bullying=random.choice([None, 1, 2, 3]),
-                    desc_bullying=faker.sentence() if random.random() < 0.2 else None,
-                    tidur=random.choice(["kurang", "cukup", "baik"]),
-                    kehadiran=random.choice(["hadir", "izin", "alfa"]),
-                    open_question=faker.sentence(),
-                )
-                r.calculate_score()
-                db.session.add(r)
-
-        db.session.commit()
-
-        # ============================
-        # NOTE GURU → MURID
-        # ============================
-        guru_list = [u for u in all_users if u.role == "guru"]
-
-        for _ in range(80):
-            guru = random.choice(guru_list)
-            murid = random.choice(murid_list)
-
-            n = Note(
-                message=faker.paragraph(),
-                creator_id=guru.id,
-                target_id=murid.id,
+        # 7. GENERATE NOTES (CATATAN GURU UNTUK SISWA)
+        # Buat beberapa note acak
+        notes = []
+        for _ in range(30): # 30 catatan acak
+            random_guru = random.choice(users_guru)
+            random_siswa = random.choice(users_siswa)
+            
+            note = Note(
+                message=faker.text(max_nb_chars=100),
+                date=today - timedelta(days=random.randint(0, RENTANG_HARI)),
+                creator_id=random_guru.id,
+                target_id=random_siswa.id
             )
-            db.session.add(n)
-
+            notes.append(note)
+        
+        db.session.add_all(notes)
         db.session.commit()
 
-        # ============================
-        # DONE
-        # ============================
-        return jsonify({"status": "success", "msg": "Dummy data generated!"}), 200
+        return jsonify({
+            "status": "success",
+            "message": f"Berhasil generate data dummy: {TOTAL_SISWA} Siswa, {TOTAL_GURU} Guru, Record {RENTANG_HARI} Hari."
+        }), 200
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({"status": "error", "msg": str(e)}), 500
+        print(f"Error generating dummy data: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
