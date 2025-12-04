@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { Play, StopCircle } from "lucide-react";
 import { dataAPI } from "@/lib/api";

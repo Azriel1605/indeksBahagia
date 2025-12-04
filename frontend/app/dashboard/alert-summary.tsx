@@ -1,3 +1,4 @@
+"use client";
 import React, {useEffect, useState} from "react";
 import { TrendingUp, TrendingDown, Users, UserPlus, AlertOctagon, Hand, UserX } from "lucide-react";
 import { dataAPI } from "@/lib/api";
