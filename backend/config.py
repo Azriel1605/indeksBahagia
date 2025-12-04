@@ -1,10 +1,14 @@
 import os
 from datetime import timedelta
 from dotenv import load_dotenv
-from pathlib import Path
-env_path = Path(__file__).parent / ".env"
 
-load_dotenv(dotenv_path=env_path)
+# folder tempat file Python ini berada
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+# path .env otomatis menyesuaikan OS
+dotenv_path = os.path.join(basedir, ".env")
+
+load_dotenv(dotenv_path)
 
 class Config:
     # Database

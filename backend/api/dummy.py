@@ -65,7 +65,7 @@ def generate_dummy_data():
                 password_hash=hashed_pw,
                 role="admin",
                 kode=f"ADM-{faker.unique.random_number(digits=3)}",
-                kelas=None
+                kelas=random.choice(KELAS_LIST)
             )
             db.session.add(admin)
         
