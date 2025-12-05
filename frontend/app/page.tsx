@@ -63,7 +63,7 @@ export default function HomePage() {
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Rata-rata Indeks Kebahagiaan Sekolah</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col items-center justify-center">
               <HappinessGauge value={80.2} label="Kebahagiaan Siswa" size={300}/>
             </CardContent>
           </Card>
