@@ -115,10 +115,10 @@ def forgot_password():
     db.session.add(reset_token)
     db.session.commit()
     
-    if not send_reset_email(user_email=email, url=reset_link):
-        return jsonify({
-            'message': 'Gagal Terkirim'
-        }), 400
+    # if not send_reset_email(user_email=email, url=reset_link):
+    #     return jsonify({
+    #         'message': 'Gagal Terkirim'
+    #     }), 400
     
     return jsonify({
         'message': 'Password reset token generated',
