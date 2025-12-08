@@ -8,8 +8,8 @@ import { AuthProvider } from "@/hooks/use-auth"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Sepuh Cipamokolan",
-  description: "Platform digital untuk pengelolaan data dan monitoring kesejahteraan lansia di tingkat RW",
+  title: "Survey Arrafi",
+  description: "Platform digital untuk pemantauan tingkat kebahagiaan di sekolah Arrafi",
 }
 
 export default function RootLayout({
