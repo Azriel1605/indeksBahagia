@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from config import Config
-from model import db, User
+from model import db, User, RecordSiswaHarianPermission, RecordSiswaMingguanPermission
 from flask_mail import Mail, Message
 from api import api
 
@@ -27,12 +27,23 @@ with app.app_context():
     user = db.session.query(User).all()
     if not user:
         admin = User(
-            username='admin',
+            username='key',
+            fullname = 'Ahmad Qeis Ismail',
             email='ahmad.qeis122@gmail.com',
-            password_hash=bcrypt.generate_password_hash('admin123').decode('utf-8'),
-            kelas='10'
-        )    
+            password_hash=bcrypt.generate_password_hash('Ra_sy6a7e2').decode('utf-8'),
+            kelas='10',
+            role='admin'
+        )
         
+        surveyStatusHarian = RecordSiswaHarianPermission(
+            is_active = True
+        )
+        surveyStatusMingguan = RecordSiswaMingguanPermission(
+            is_active = True
+        )
+        
+        db.session.add(surveyStatusHarian)
+        db.session.add(surveyStatusMingguan)
         db.session.add(admin)
         db.session.commit()
 

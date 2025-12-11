@@ -19,6 +19,7 @@ class User(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
+    fullname = db.Column(db.String(100), unique=False, nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default='guest')
@@ -69,19 +70,15 @@ class User(db.Model):
         """Cek apakah user boleh mengisi survey harian/mingguan."""
 
         if tipe == "harian":
-            permission = RecordSiswaHarianPermission.query.filter_by(
-                kelas=self.kelas, is_active=True
-            ).first()
+            permission = RecordSiswaHarianPermission.query.first()
         
         elif tipe == "mingguan":
-            permission = RecordSiswaMingguanPermission.query.filter_by(
-                kelas=self.kelas, is_active=True
-            ).first()
+            permission = RecordSiswaMingguanPermission.query.first()
         
         else:
             raise ValueError("Tipe survey tidak valid. Gunakan 'harian' atau 'mingguan'.")
 
-        if not permission:
+        if not permission or not permission.is_active:
             return False, f"Kelas kamu belum diizinkan mengisi survey {tipe}."
 
         if self.has_filled_survey(tipe):
@@ -92,7 +89,6 @@ class User(db.Model):
 class RecordSiswaHarianPermission(db.Model):
     __tablename__   = 'record_siswa_harian_permission'
     id              = db.Column(db.Integer, primary_key=True)
-    kelas           = db.Column(db.String(50), nullable=False)
     is_active       = db.Column(db.Boolean, nullable=False, default="False")
     
 class RecordSiswaHarian(db.Model):
@@ -132,7 +128,6 @@ class RecordSiswaHarian(db.Model):
 class RecordSiswaMingguanPermission(db.Model):
     __tablename__   = 'record_siswa_mingguan_permission'
     id              = db.Column(db.Integer, primary_key=True)
-    kelas           = db.Column(db.String(50), nullable=False)
     is_active       = db.Column(db.Boolean, nullable=False, default="False")
     
 class RecordSiswaMingguan(db.Model):

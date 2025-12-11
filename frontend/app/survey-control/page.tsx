@@ -5,8 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { FileUp, UserPlus } from "lucide-react"
 import RouteGuard from "@/components/route-guard"
 import SurveyHarianReponse from "./reponse-harian"
-import SurveyAccessHarianButton from "./survey-harian-control"
-import SurveyAccessMingguanButton from "./survey-mingguan-control"
 import SurveyMingguanResponse from "./response-mingguan"
 import WordCloud from "@/components/word-cloud"
 import { useEffect, useState } from "react"
@@ -56,8 +54,6 @@ function InputDataContent() {
           </TabsList>
 
           <TabsContent value="harian">
-            <SurveyAccessHarianButton />
-            <br />
             <SurveyHarianReponse />
             <br />
             <div className="flex items-center justify-between w-full bg-white border border-gray-200 rounded-2xl shadow-md p-4">
@@ -65,8 +61,6 @@ function InputDataContent() {
             </div>
           </TabsContent>
           <TabsContent value="mingguan">
-            <SurveyAccessMingguanButton />
-            <br />
             <SurveyMingguanResponse />
             <br />
             <div className="flex items-center justify-between w-full bg-white border border-gray-200 rounded-2xl shadow-md p-4">

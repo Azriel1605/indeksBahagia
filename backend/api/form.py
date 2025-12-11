@@ -8,14 +8,7 @@ from sqlalchemy import func
 def submit_form_harian():
     data = request.get_json()
     
-    kelas = session.get('kelas')    
-    print(kelas, type(kelas))
-    permit = RecordSiswaHarianPermission.query.filter_by(kelas=kelas).first()
-    
-    if not permit:
-        return jsonify({
-            'message': 'Kelas tidak ditemukan'
-        }), 400
+    permit = RecordSiswaHarianPermission.query.first()
     
     if not permit.is_active:
         return jsonify({
@@ -40,8 +33,6 @@ def submit_form_harian():
     db.session.add(record)
     db.session.commit()
     
-    print("SUCCESS")
-    
     return jsonify({
         'message' : "success"
     }), 200
@@ -49,15 +40,8 @@ def submit_form_harian():
 @api.route('/submit-form-mingguan', methods=["POST"])
 def submit_form_mingguan():
     data = request.get_json()
-    
-    kelas = session.get('kelas')    
-    print(kelas, type(kelas))
-    permit = RecordSiswaMingguanPermission.query.filter_by(kelas=kelas).first()
-    
-    if not permit:
-        return jsonify({
-            'message': 'Kelas tidak ditemukan'
-        }), 400
+
+    permit = RecordSiswaMingguanPermission.query.first()
     
     if not permit.is_active:
         return jsonify({
@@ -159,8 +143,7 @@ def toggle_survey():
     kelas = session.get('kelas')
     data = request.get_json()
     tipe = data.get('type')
-    action = data.get('action')
-    
+    action = data.get('action') 
     
     if tipe == "harian":
         change = RecordSiswaHarianPermission.query.filter_by(kelas=kelas).first()
