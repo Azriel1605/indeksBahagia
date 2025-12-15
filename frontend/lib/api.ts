@@ -60,7 +60,28 @@ export const authAPI = {
     },
       body: JSON.stringify({ token, password }),
     }),
+
+  createAccount: (email: string) =>
+    apiCall("/api/create-account", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+
+  resetAccount: (token: string, password: string, username:string) =>
+    apiCall("/api/reset-account", {
+      method: "PUT",
+      headers: {
+      "Content-Type": "application/json"
+    },
+      body: JSON.stringify({ token, password, username }),
+    }),
+
+
   }
+
+
+    
+
 
 
 // --- dataAPI (MODIFIED) ---

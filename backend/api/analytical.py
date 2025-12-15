@@ -2,7 +2,7 @@ from flask import request, jsonify, session
 from . import api
 from model import db, User, RecordSiswaHarian, RecordSiswaMingguan
 from datetime import date, datetime, timedelta
-from sqlalchemy import func, or_, cast, Date
+from sqlalchemy import func, or_, cast, Date, distinct
 from sqlalchemy.sql import over
 import math
 
@@ -436,3 +436,66 @@ def get_barchart():
     print(response)
 
     return jsonify(response), 200
+
+@api.route('/submission-percentage')
+def submission_percentage():
+    tipe = request.args.get('tipe', 'harian')
+
+    if tipe == 'harian':
+        RecordModel = RecordSiswaHarian
+    elif tipe == 'mingguan':
+        RecordModel = RecordSiswaMingguan
+    else:
+        return jsonify({
+            "message": "Tipe survey tidak valid. Gunakan 'harian' atau 'mingguan'."
+        }), 400
+
+    # -----------------------------------------
+    # 1. Hitung maksimal pengisian (distinct tanggal)
+    # -----------------------------------------
+    max_days = db.session.query(
+        func.count(
+            distinct(cast(RecordModel.date, Date))
+        )
+    ).scalar() or 0
+
+    # -----------------------------------------
+    # 2. Hitung jumlah pengisian per user
+    # -----------------------------------------
+    submissions = db.session.query(
+        User.id.label('user_id'),
+        User.fullname,
+        User.kelas,
+        func.count(
+            distinct(cast(RecordModel.date, Date))
+        ).label('filled_days')
+    ).outerjoin(
+        RecordModel, RecordModel.user_id == User.id
+    ).group_by(
+        User.id
+    ).all()
+
+    # -----------------------------------------
+    # 3. Bangun response
+    # -----------------------------------------
+    results = []
+    for row in submissions:
+        percentage = 0
+        if max_days > 0:
+            percentage = round((row.filled_days / max_days) * 100, 2)
+
+        results.append({
+            "user_id": row.user_id,
+            "fullname": row.fullname,
+            "kelas": row.kelas,
+            "filled_days": row.filled_days,
+            "max_days": max_days,
+            "percentage": percentage
+        })
+
+    return jsonify({
+        "tipe": tipe,
+        "max_distinct_days": max_days,
+        "data": results
+    }), 200
+

@@ -24,115 +24,87 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
-              Happy School
+    <div className="relative h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 flex items-center">
+      
+      {/* Decorative Blobs */}
+      <div className="absolute -top-32 -left-32 w-96 h-96 bg-indigo-300/40 rounded-full blur-3xl" />
+      <div className="absolute top-1/3 -right-32 w-96 h-96 bg-purple-300/40 rounded-full blur-3xl" />
+      <div className="absolute bottom-[-6rem] left-1/3 w-96 h-96 bg-blue-300/40 rounded-full blur-3xl" />
+
+      {/* Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+          {/* Left Content */}
+          <div>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 leading-tight">
+              Survey <span className="text-indigo-600">Ar Rafi</span>
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-              Platform digital untuk pemantauan data dan analisis Indeks Kebahagiaan Sekolah secara real-time
+
+            <p className="mt-5 text-gray-600 text-lg max-w-xl">
+              Platform digital untuk pemantauan dan analisis  
+              <span className="font-semibold text-gray-800">
+                {" "}Indeks Kebahagiaan Sekolah
+              </span>{" "}
+              secara real-time, akurat, dan transparan.
             </p>
-            <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
-              <div className="rounded-md shadow">
-                <Link href="/dashboard">
-                  <Button size="lg" className="w-full sm:w-auto">
-                    Lihat Analisis
-                  </Button>
-                </Link>
-              </div>
-              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
-                <Link href="/survey-control">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent">
-                    Buka Survey
-                  </Button>
-                </Link>
-              </div>
+
+            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+              <Link href="/dashboard">
+                <Button size="lg" className="px-8">
+                  Lihat Analisis
+                </Button>
+              </Link>
+
+              <Link href="/survey-control">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="px-8 bg-white/70 backdrop-blur"
+                >
+                  Buka Survey
+                </Button>
+              </Link>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Stats Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Gauge Chart and counter student */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 lg:grid-cols-3">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Rata-rata Indeks Kebahagiaan Sekolah</CardTitle>
-            </CardHeader>
+          {/* Right Glass Card */}
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-8 grid grid-cols-2 gap-6">
             
-            {/* PERBAIKAN: Tambahkan className flex untuk memusatkan konten */}
-            <CardContent className="flex flex-col items-center justify-center min-h-[350px]">
-              <HappinessGauge value={80.2} label="Kebahagiaan Siswa" size={300}/>
-            </CardContent>
-          </Card>
+            <StatCard
+              title="Pengguna Aktif"
+              value="1.248"
+              desc="Siswa & Guru"
+            />
+            <StatCard
+              title="Indeks"
+              value="82.4%"
+              desc="Tingkat Kebahagiaan"
+            />
+            <StatCard
+              title="Survey Aktif"
+              value="4"
+              desc="Bulan ini"
+            />
+            <StatCard
+              title="Update"
+              value="Real-time"
+              desc="Live Dashboard"
+            />
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Guage Chart</CardTitle>
-              <Heart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              {/* Judul dan deskripsi */}
-        <h2 className="text-lg font-bold mb-1">
-          Rata-rata Indeks Kebahagiaan Sekolah
-        </h2>
-        <h3 className="text-sm font-semibold mb-3">(SHI Overall)</h3>
-
-        {/* Keterangan warna */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 bg-white rounded-full shadow-sm px-3 py-2">
-            <span className="text-red-500 font-semibold">Merah (&lt;40%)</span>:
-            <span className="text-gray-700">Risiko tinggi</span>
           </div>
-
-          <div className="flex items-center gap-2 bg-white rounded-full shadow-sm px-3 py-2">
-            <span className="text-yellow-500 font-semibold">
-              Kuning (40%–59%)
-            </span>
-            : <span className="text-gray-700">Perlu perhatian</span>
-          </div>
-
-          <div className="flex items-center gap-2 bg-white rounded-full shadow-sm px-3 py-2">
-            <span className="text-green-600 font-semibold">
-              Hijau (60%–79%)
-            </span>
-            : <span className="text-gray-700">Baik</span>
-          </div>
-
-          <div className="flex items-center gap-2 bg-white rounded-full shadow-sm px-3 py-2">
-            <span className="text-blue-600 font-semibold">
-              Biru (80%–100%)
-            </span>
-            : <span className="text-gray-700">Sangat baik</span>
-          </div>
-        </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Jumlah siswa dalam kondisi risiko</CardTitle>
-              <Heart className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="flex flex-col items-center w-full h-full">
-              <p className="text-gray-600">Siswa yang berada pada status "warning" selama 3 hari berturut-turu</p>
-              <br />
-              <InfoCard value={23} label="Siswa" color="#EF4444" size="lg" />
-            </CardContent>
-          </Card>
-        </div>
-
-        <br />
-
-        {/* Line Chart and Distribution */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2 space-y-4">
-          <LineChartHome />
-          <BarChartSHI date={new Date().toISOString().slice(0, 10)} />
         </div>
       </div>
+    </div>
+  )
+}
+
+function StatCard({ title, value, desc }: { title: string; value: string; desc: string }) {
+  return (
+    <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+      <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+      <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+      <p className="text-xs text-gray-500 mt-1">{desc}</p>
     </div>
   )
 }
