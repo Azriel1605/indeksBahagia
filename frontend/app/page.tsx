@@ -12,8 +12,11 @@ import LineChartSekolah from "@/components/ui/line-chart"
 import BarChartSHI from "@/components/ui/barchart"
 import LineChartHome from "@/components/ui/line-chart-home"
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
+import { useAuth } from "@/hooks/use-auth"
 
 export default function HomePage() {
+  const { user } = useAuth();
+
   useEffect(() => {
     console.log("API_BASE_URL:", API_BASE_URL);
     fetch(`${API_BASE_URL}/note`)
@@ -50,13 +53,15 @@ export default function HomePage() {
             </p>
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link href="/dashboard">
-                <Button size="lg" className="px-8">
-                  Lihat Analisis
-                </Button>
-              </Link>
+              {user?.role === "admin" || user?.role === "guru" && (
+                <Link href="/dashboard">
+                  <Button size="lg" className="px-8">
+                    Lihat Analisis
+                  </Button>
+                </Link>
+              )}
 
-              <Link href="/survey-control">
+              <Link href={user?.role === "user" ? "/survey" : "/survey-control"}>
                 <Button
                   variant="outline"
                   size="lg"
@@ -69,7 +74,7 @@ export default function HomePage() {
           </div>
 
           {/* Right Glass Card */}
-          <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-8 grid grid-cols-2 gap-6">
+          <div className="bg-white/60 backdrop-blur-xl rounded-2xl shadow-xl p-8 grid grid-cols-2 gap-6 c-border">
             
             <StatCard
               title="Pengguna Aktif"

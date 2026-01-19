@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface LikertQuestionJoyfulRequiredProps {
   number?: number; // nomor pertanyaan
@@ -11,11 +11,11 @@ interface LikertQuestionJoyfulRequiredProps {
 }
 
 const OPTIONS = [
-  "Sangat Tidak Setuju",
-  "Tidak Setuju",
-  "Netral",
-  "Setuju",
-  "Sangat Setuju",
+  { label: "Sangat Tidak Setuju", value: 1, emoji: "😞" },
+  { label: "Tidak Setuju", value: 2, emoji: "🙁" },
+  { label: "Netral", value: 3, emoji: "😐" },
+  { label: "Setuju", value: 4, emoji: "😃" },
+  { label: "Sangat Setuju", value: 5, emoji: "🤩" },
 ];
 
 const COLORS = [
@@ -25,18 +25,28 @@ const COLORS = [
   "bg-green-100 border-green-300",
   "bg-teal-100 border-teal-300",
 ];
-
 const ACTIVE_COLORS = [
-  "bg-red-500 text-white border-red-600",
-  "bg-orange-500 text-white border-orange-600",
-  "bg-yellow-500 text-white border-yellow-600",
-  "bg-green-500 text-white border-green-600",
-  "bg-teal-500 text-white border-teal-600",
+  "bg-red-400 text-white border-red-500",
+  "bg-orange-400 text-white border-orange-500",
+  "bg-yellow-400 text-white border-yellow-500",
+  "bg-green-400 text-white border-green-500",
+  "bg-teal-400 text-white border-teal-500",
 ];
 
 const LikertQuestionJoyfulRequired: React.FC<
   LikertQuestionJoyfulRequiredProps
 > = ({ number, question, value, onChange, required = false, showError = false, option = OPTIONS }) => {
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    return [...array].sort(() => Math.random() - 0.5);
+  };
+
+  const [shuffledOptions, setShuffledOptions] = React.useState<string[]>([]);
+
+  useEffect(() => {
+    // Acak opsi setiap kali komponen dimount
+    setShuffledOptions(shuffleArray(OPTIONS));
+  }, []);
+
   return (
     <div className="relative w-full max-w-3xl mx-auto p-6 rounded-3xl shadow-md bg-gradient-to-b from-white to-blue-50 border border-blue-100">
       {/* Nomor pertanyaan */}

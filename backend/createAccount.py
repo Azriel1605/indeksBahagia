@@ -12,7 +12,7 @@ def send_create_account(user_email, url):
     """Send password reset email with a bright theme"""
     try:
         msg = Message(
-            subject='🔐 Password Reset Request - Survey Ar Rafi',
+            subject='🔐 Pembuatan Akun - Survey Ar Rafi',
             recipients=[user_email],
             html=f'''
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #e0f7fa 0%, #fffde7 100%); padding: 20px; border-radius: 15px;">
@@ -26,8 +26,7 @@ def send_create_account(user_email, url):
                         Hello! 👋
                     </p>
                     <p style="color: #37474f; line-height: 1.6;">
-                        We received a request to reset your password for your SurveyArRafi account.
-                        If you made this request, click the button below to reset your password:
+                        Silahkan Buat akun Anda dengan mengklik tombol di bawah ini.
                     </p>
                     
                     <div style="text-align: center; margin: 30px 0;">
@@ -49,7 +48,7 @@ def send_create_account(user_email, url):
                     </p>
                     
                     <p style="color: #616161; line-height: 1.6; font-size: 0.9rem;">
-                        If you didn't request this password reset, you can safely ignore this email.
+                        If you already create your account, you can safely ignore this email.
                     </p>
                 </div>
                 
@@ -73,6 +72,8 @@ def createAcc(email):
     if not user:
         return "No email Found"
     
+    
+    
     # Generate reset token
     token = secrets.token_urlsafe(32)
     expires_at = datetime.now() + timedelta(hours=168)
@@ -94,4 +95,22 @@ def createAcc(email):
     
     return 'Password reset token generated'
 
-print(createAcc('ahmad.qeis122@gmail.com'))
+def makeAcc(nama, nis, email):
+    user = User(
+        username=nis,
+        fullname=nama,
+        email=email,
+        password_hash="masihkosong",
+        role="user",
+        kode=nis,
+        kelas=None
+    )
+    db.session.add(user)
+    db.session.commit()
+    return "User Created"
+
+i = 1
+nama = 
+nis = 
+
+# print(createAcc('ahmad.qeis122@gmail.com'))
