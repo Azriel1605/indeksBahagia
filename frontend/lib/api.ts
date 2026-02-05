@@ -46,6 +46,12 @@ export const authAPI = {
 
   checkAuth: () => apiCall("/api/check-auth"),
 
+  validateToken: (token: string) =>
+    apiCall(`/api/validate-token?token=${encodeURIComponent(token)}`, {
+      method: "GET",
+    }),
+
+
   forgotPassword: (email: string) =>
     apiCall("/api/forgot-password", {
       method: "POST",

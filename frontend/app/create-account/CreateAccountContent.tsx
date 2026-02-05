@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams, useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +16,7 @@ export default function ForgotPasswordContent() {
   const router = useRouter()
   const token = searchParams.get("token")
 
+  const [isTokenValid, setIsTokenValid] = useState(false)
   const [email, setEmail] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [newUsername, setNewUsername] = useState("")
@@ -84,12 +85,33 @@ export default function ForgotPasswordContent() {
     }
   }
 
+  useEffect(() => {
+    const validateToken = async () => {
+      if (token) {
+        try {
+          const response = await authAPI.validateToken(token)
+          if (response.ok) {
+            setIsTokenValid(true)
+          } else {
+            setIsTokenValid(false)
+          }
+        } catch {
+          setIsTokenValid(false)
+        }
+      }
+    }
+
+    validateToken()
+  }, [token])
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
+
+      {isTokenValid && (
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-center mb-4">
+              <div className="h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">SI</span>
             </div>
           </div>
@@ -195,6 +217,7 @@ export default function ForgotPasswordContent() {
           )}
         </CardContent>
       </Card>
+      )}
     </div>
   )
 }

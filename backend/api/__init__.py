@@ -11,4 +11,4 @@ def login_required(f):
     return decorated_function
 
 # Import semua route file di sini agar otomatis terdaftar
-from . import user, form, analytical, admin, dummy, table
+from . import user, form, analytical, admin, dummy, table, auth

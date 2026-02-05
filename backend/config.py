@@ -2,13 +2,11 @@ import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
-# folder tempat file Python ini berada
+# folder backend
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-# path .env otomatis menyesuaikan OS
-dotenv_path = os.path.join(basedir, ".env")
-
-load_dotenv(dotenv_path)
+# load .env secara eksplisit
+load_dotenv(os.path.join(basedir, ".env"))
 
 class Config:
     # Database

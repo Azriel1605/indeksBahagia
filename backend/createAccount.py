@@ -12,13 +12,13 @@ def send_create_account(user_email, url):
     """Send password reset email with a bright theme"""
     try:
         msg = Message(
-            subject='🔐 Pembuatan Akun - Survey Ar Rafi',
+            subject='🔐 Pembuatan Akun Survey Ar Rafi',
             recipients=[user_email],
             html=f'''
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: linear-gradient(135deg, #e0f7fa 0%, #fffde7 100%); padding: 20px; border-radius: 15px;">
                 <div style="text-align: center; margin-bottom: 30px;">
                     <h1 style="color: #00796b; font-size: 2rem;">Survey Ar Rafi</h1>
-                    <h2 style="color: #388e3c;">Reset Your Password</h2>
+                    <h2 style="color: #388e3c;">Aktivasi Akun</h2>
                 </div>
                 
                 <div style="background: #ffffff; padding: 25px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
@@ -40,21 +40,21 @@ def send_create_account(user_email, url):
                             font-size: 1.1rem;
                             display: inline-block;
                             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-                        ">🔓 Reset Password</a>
+                        ">🔓 Aktivasi Akun</a>
                     </div>
                     
                     <p style="color: #616161; line-height: 1.6; font-size: 0.9rem;">
-                        ⏰ <strong>This link will expire in 1 hour</strong> for security reasons.
+                        ⏰ <strong>Link Pembuatan akun akan hangus dalam 168 jam</strong> untuk alasan keamanan.
                     </p>
                     
                     <p style="color: #616161; line-height: 1.6; font-size: 0.9rem;">
-                        If you already create your account, you can safely ignore this email.
+                        Jika Anda sudah membuat akun, Anda dapat mengabaikan email ini.
                     </p>
                 </div>
                 
                 <div style="text-align: center; color: #90a4ae; font-size: 0.8rem;">
-                    <p>This is an automated message from Survey Ar Rafi</p>
-                    <p>Please do not reply to this email</p>
+                    <p>Pesan ini merupakan pesan otomatis dari aplikasi Survey Ar Rafi</p>
+                    <p>Mohon tidak membalas email ini</p>
                 </div>
             </div>
             '''
@@ -101,7 +101,7 @@ def makeAcc(nama, nis, email):
         fullname=nama,
         email=email,
         password_hash="masihkosong",
-        role="user",
+        role="guru",
         kode=nis,
         kelas=None
     )
@@ -109,8 +109,4 @@ def makeAcc(nama, nis, email):
     db.session.commit()
     return "User Created"
 
-i = 1
-nama = 
-nis = 
-
-# print(createAcc('ahmad.qeis122@gmail.com'))
+print(createAcc("ahmad.qeis122@gmail.com"))
