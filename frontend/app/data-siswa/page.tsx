@@ -162,6 +162,16 @@ function DataTableContent() {
       const response = await dataAPI.getSiswaFilterOptions()
       if (response.ok) {
         const options = await response.json()
+        
+        // TAMBAHAN: Logika Sorting
+        // Pastikan kelas_list ada dan berupa array sebelum di-sort
+        if (options.kelas_list && Array.isArray(options.kelas_list)) {
+          options.kelas_list.sort((a: string, b: string) => 
+            // Numeric: true memastikan "2" dianggap lebih kecil dari "10"
+            a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
+          );
+        }
+
         setFilterOptions(options) // API backend sekarang hanya mengembalikan kelas_list
       }
     } catch (error) {

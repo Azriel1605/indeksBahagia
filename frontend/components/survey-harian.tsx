@@ -131,11 +131,6 @@ export default function SurveyHarian(){
             {/* Bagian Pertanyaan Skala Likert */}
             {/* ---------------------------------------------------------------- */}
 
-            <CardHeader>
-                <CardTitle>Data Pribadi</CardTitle>
-                <CardDescription>Informasi dasar identitas lansia</CardDescription>
-            </CardHeader>
-
             {/* Bahagia */}
             <LikertQuestion
                 number={1}

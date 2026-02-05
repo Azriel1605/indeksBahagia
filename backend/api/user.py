@@ -187,15 +187,18 @@ def access_classes():
     if not role or not kelas:
         return jsonify({'message': 'error'}), 400
     if role in ['admin', 'superadmin']:
-        access = db.session.query(User.kelas).distinct().all()
+        access = [row.kelas for row in db.session.query(User.kelas).distinct().order_by(User.kelas).all()]
+        print(access)
+
         
         kelasList = [
             {
-                "label": k[0],
-                "value": k[0]
+                "label": k,
+                "value": k
             }
             for k in access
         ]
+
         kelasList.insert(0, {"label": "Semua Kelas", "value": "Semua Kelas"})
         
         return jsonify(kelasList), 200

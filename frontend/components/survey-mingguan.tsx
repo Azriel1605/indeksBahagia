@@ -105,39 +105,39 @@ export default function SurveyMingguan(){
         </Alert>
         )}
         <Card>
-
-        {/* 🔵 Bagian Kesediaan */}
-        <div className="p-4 border rounded-xl bg-blue-50">
-            <p className="font-medium mb-3 text-blue-900">
-                Saya bersedia mengisi dengan jujur. <span className="text-red-500">*</span>
-            </p>
-
-            <button
-                type="button"
-                onClick={() => setSetuju(true)}
-                className={`
-                    w-full py-3 rounded-xl font-semibold transition-all
-                    flex items-center justify-center space-x-2
-                    ${setuju
-                        ? "bg-green-600 hover:bg-green-700 text-white shadow-md scale-[1.01]"
-                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                    }
-                `}
-            >
-                {setuju && (
-                    <span className="text-xl">✔</span>
-                )}
-                <span>
-                    {setuju ? "Sudah Menyetujui" : "Ya, Saya Setuju"}
-                </span>
-            </button>
-        </div>
-
         <CardHeader>
-        <CardTitle>Data Pribadi</CardTitle>
-        <CardDescription>Informasi dasar identitas lansia</CardDescription>
+            <CardTitle>Pernyataan Kesediaan</CardTitle>
+            <CardDescription>Anda harus menyetujui untuk melanjutkan survei</CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-4">
+            
+            {/* 🔵 Bagian Kesediaan */}
+            <div className="p-4 border rounded-xl bg-blue-50">
+                <p className="font-medium mb-3 text-blue-900">
+                    Saya bersedia mengisi dengan jujur. <span className="text-red-500">*</span>
+                </p>
+
+                <button
+                    type="button"
+                    onClick={() => setSetuju(true)}
+                    className={`
+                        w-full py-3 rounded-xl font-semibold transition-all
+                        flex items-center justify-center space-x-2
+                        ${setuju
+                            ? "bg-green-600 hover:bg-green-700 text-white shadow-md scale-[1.01]"
+                            : "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                        }
+                    `}
+                >
+                    {setuju && (
+                        <span className="text-xl">✔</span>
+                    )}
+                    <span>
+                        {setuju ? "Sudah Menyetujui" : "Ya, Saya Setuju"}
+                    </span>
+                </button>
+            </div>
         {/* Pertanyaan Skala Likert */}
         {/* Bahagia */}
         <div>
